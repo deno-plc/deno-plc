@@ -1,0 +1,8 @@
+tmp
+/target
+/gen
+/.vite
+*.exe
+/dist
+.block-commit
+node_modules

@@ -1,0 +1,38 @@
+{
+    "workspace": [
+        "./utils",
+        "./signals"
+    ],
+    "imports": {
+        "@std/assert": "jsr:@std/assert@^1.0.9",
+        "@std/encoding": "jsr:@std/encoding@^1.0.5"
+    },
+    "nodeModulesDir": "auto",
+    "compilerOptions": {
+        "jsx": "react-jsx",
+        "jsxImportSource": "preact",
+        "lib": [
+            "deno.window",
+            "deno.ns",
+            "ESNext",
+            "DOM",
+            "DOM.Iterable",
+            "DOM.AsyncIterable",
+            "webworker"
+        ]
+    },
+    "lint": {
+        "exclude": [
+            "target",
+            "dist"
+        ]
+    },
+    "fmt": {
+        "indentWidth": 4,
+        "lineWidth": 150,
+        "exclude": [
+            "target",
+            "dist"
+        ]
+    }
+}
