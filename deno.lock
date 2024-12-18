@@ -1,12 +1,12 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@deno-plc/vite-plugin-deno@^2.2.1": "2.2.1",
     "jsr:@hono/hono@^4.6.14": "4.6.14",
     "jsr:@logtape/logtape@0.8": "0.8.0",
     "jsr:@luca/cases@1": "1.0.0",
-    "jsr:@std/assert@0.223": "0.223.0",
-    "jsr:@std/assert@0.226": "0.226.0",
+    "jsr:@nats-io/nats-core@^3.0.0-48": "3.0.0-48",
+    "jsr:@nats-io/nkeys@~2.0.0-3": "2.0.0",
+    "jsr:@nats-io/nuid@2.0.1-2": "2.0.1-2",
     "jsr:@std/assert@^1.0.9": "1.0.10",
     "jsr:@std/assert@~0.225.2": "0.225.3",
     "jsr:@std/cli@^1.0.8": "1.0.9",
@@ -21,8 +21,7 @@
     "jsr:@std/net@^1.0.4": "1.0.4",
     "jsr:@std/path@^1.0.4": "1.0.8",
     "jsr:@std/path@^1.0.8": "1.0.8",
-    "jsr:@std/path@~0.225.1": "0.225.2",
-    "jsr:@std/semver@^1.0.2": "1.0.3",
+    "jsr:@std/semver@^1.0.3": "1.0.3",
     "jsr:@std/streams@^1.0.8": "1.0.8",
     "npm:@coderspirit/nominal@^4.1.1": "4.1.1",
     "npm:@preact/compat@*": "18.3.1_preact@10.24.3",
@@ -34,35 +33,22 @@
     "npm:@prefresh/vite@^2.4.6": "2.4.6_preact@10.24.3_vite@6.0.3__@types+node@22.5.4_@types+node@22.5.4",
     "npm:@types/node@*": "22.5.4",
     "npm:@xterm/xterm@^5.5.0": "5.5.0",
-    "npm:acorn-walk@^8.3.3": "8.3.4",
-    "npm:acorn@^8.12.1": "8.14.0",
+    "npm:acorn-walk@^8.3.4": "8.3.4",
+    "npm:acorn@^8.14.0": "8.14.0",
     "npm:cspell@^8.14.2": "8.14.2",
-    "npm:lebab@^3.2.4": "3.2.6",
+    "npm:lebab@^3.2.6": "3.2.6",
+    "npm:material-symbols@*": "0.23.0",
     "npm:preact-render-to-string@^6.5.6": "6.5.10_preact@10.24.3",
+    "npm:preact@*": "10.24.3",
     "npm:preact@^10.22.1": "10.24.3",
-    "npm:resolve.exports@^2.0.2": "2.0.2",
+    "npm:resolve.exports@^2.0.3": "2.0.3",
     "npm:tailwindcss@^3.4.17": "3.4.17_postcss@8.4.49",
-    "npm:validate-npm-package-name@^5.0.1": "5.0.1",
+    "npm:tweetnacl@1.0.3": "1.0.3",
+    "npm:validate-npm-package-name@6": "6.0.0",
     "npm:vite@^6.0.3": "6.0.3_@types+node@22.5.4",
-    "npm:zod@^3.22.5": "3.23.8",
     "npm:zod@^3.24.1": "3.24.1"
   },
   "jsr": {
-    "@deno-plc/vite-plugin-deno@2.2.1": {
-      "integrity": "064544afa94c6fe21f7f5793a635ec5f2aa8576b96374df6ba83d0522ae6efea",
-      "dependencies": [
-        "jsr:@std/assert@0.223",
-        "jsr:@std/assert@~0.225.2",
-        "jsr:@std/path@~0.225.1",
-        "jsr:@std/semver",
-        "npm:acorn",
-        "npm:acorn-walk",
-        "npm:lebab",
-        "npm:resolve.exports",
-        "npm:validate-npm-package-name",
-        "npm:zod@^3.22.5"
-      ]
-    },
     "@hono/hono@4.6.14": {
       "integrity": "b39a5488266adf448fb1081bc3071a0d05145e72f3ab3ff83cf140e780c6c1de"
     },
@@ -72,14 +58,24 @@
     "@luca/cases@1.0.0": {
       "integrity": "b5f9471f1830595e63a2b7d62821ac822a19e16899e6584799be63f17a1fbc30"
     },
-    "@std/assert@0.223.0": {
-      "integrity": "eb8d6d879d76e1cc431205bd346ed4d88dc051c6366365b1af47034b0670be24"
+    "@nats-io/nats-core@3.0.0-48": {
+      "integrity": "c2824e1df87b32712e2b420f05205df058b740e47924228f6cdc020f8a7cfce7",
+      "dependencies": [
+        "jsr:@nats-io/nkeys",
+        "jsr:@nats-io/nuid"
+      ]
+    },
+    "@nats-io/nkeys@2.0.0": {
+      "integrity": "72812e1df75e23ad05a8aedcfc218e69d90808bd1a9b6f6680350901d0c2363e",
+      "dependencies": [
+        "npm:tweetnacl"
+      ]
+    },
+    "@nats-io/nuid@2.0.1-2": {
+      "integrity": "0cf115cfbc5e93c81464696e1c2cf3fdcd43d8aa23ba7446067d8e91029d39b8"
     },
     "@std/assert@0.225.3": {
       "integrity": "b3c2847aecf6955b50644cdb9cf072004ea3d1998dd7579fc0acb99dbb23bd4f"
-    },
-    "@std/assert@0.226.0": {
-      "integrity": "0dfb5f7c7723c18cec118e080fec76ce15b4c31154b15ad2bd74822603ef75b3"
     },
     "@std/assert@1.0.9": {
       "integrity": "a9f0c611a869cc791b26f523eec54c7e187aab7932c2c8e8bea0622d13680dcd",
@@ -135,12 +131,6 @@
     },
     "@std/net@1.0.4": {
       "integrity": "2f403b455ebbccf83d8a027d29c5a9e3a2452fea39bb2da7f2c04af09c8bc852"
-    },
-    "@std/path@0.225.2": {
-      "integrity": "0f2db41d36b50ef048dcb0399aac720a5348638dd3cb5bf80685bf2a745aa506",
-      "dependencies": [
-        "jsr:@std/assert@0.226"
-      ]
     },
     "@std/path@1.0.8": {
       "integrity": "548fa456bb6a04d3c1a1e7477986b6cffbce95102d0bb447c67c4ee70e0364be"
@@ -1372,6 +1362,9 @@
         "yallist"
       ]
     },
+    "material-symbols@0.23.0": {
+      "integrity": "sha512-ciq9bPgw5bFGC807lT3KgbvU97bC7w6DeUQmqLXdIHD28L/FD9ajvX11swtQXcMV/nEjQ/fI6u5NVtli18qUqQ=="
+    },
     "merge2@1.4.1": {
       "integrity": "sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg=="
     },
@@ -1549,8 +1542,8 @@
     "resolve-from@5.0.0": {
       "integrity": "sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw=="
     },
-    "resolve.exports@2.0.2": {
-      "integrity": "sha512-X2UW6Nw3n/aMgDVy+0rSqgHlv39WZAlZrXCdnbyEiKm17DSqHX4MmQMaST3FbeWR5FTuRcUwYAziZajji0Y7mg=="
+    "resolve.exports@2.0.3": {
+      "integrity": "sha512-OcXjMsGdhL4XnbShKpAcSqPMzQoYkYyhbEaeSko47MjRP9NfEQMhZkXL1DoFlt9LWQn4YttrdnV6X2OiyzBi+A=="
     },
     "resolve@1.22.9": {
       "integrity": "sha512-QxrmX1DzraFIi9PxdG5VkRfRwIgjwyud+z/iBwfRRrVmHc+P9Q7u2lSSpQ6bjr2gy5lrqIiU9vb6iAeGf2400A==",
@@ -1716,6 +1709,9 @@
     "tslib@2.8.1": {
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
     },
+    "tweetnacl@1.0.3": {
+      "integrity": "sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw=="
+    },
     "typescript@5.6.3": {
       "integrity": "sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw=="
     },
@@ -1733,8 +1729,8 @@
     "util-deprecate@1.0.2": {
       "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw=="
     },
-    "validate-npm-package-name@5.0.1": {
-      "integrity": "sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ=="
+    "validate-npm-package-name@6.0.0": {
+      "integrity": "sha512-d7KLgL1LD3U3fgnvWEY1cQXoO/q6EQ1BSz48Sa149V/5zVTAbgmZIpyI8TRi6U9/JNyeYLlTKsEMPtLC27RFUg=="
     },
     "vite@6.0.3_@types+node@22.5.4": {
       "integrity": "sha512-Cmuo5P0ENTN6HxLSo6IHsjCLn/81Vgrp81oaiFFMRa8gGDj5xEjIcEpf2ZymZtZR8oU0P2JX5WuUp/rlXcHkAw==",
@@ -1783,9 +1779,6 @@
     "yaml@2.5.1": {
       "integrity": "sha512-bLQOjaX/ADgQ20isPJRvF0iRUHIxVhYvr53Of7wGcWlO2jvtUlH5m87DsmulFVxRpNLOnI4tB6p/oh8D7kpn9Q=="
     },
-    "zod@3.23.8": {
-      "integrity": "sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g=="
-    },
     "zod@3.24.1": {
       "integrity": "sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A=="
     }
@@ -1825,23 +1818,30 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@deno-plc/vite-plugin-deno@^2.2.1",
       "jsr:@hono/hono@^4.6.14",
       "jsr:@logtape/logtape@0.8",
       "jsr:@luca/cases@1",
+      "jsr:@nats-io/nats-core@^3.0.0-48",
       "jsr:@std/assert@^1.0.9",
       "jsr:@std/cli@^1.0.9",
       "jsr:@std/encoding@^1.0.5",
       "jsr:@std/fs@^1.0.7",
       "jsr:@std/http@^1.0.12",
+      "jsr:@std/path@^1.0.8",
+      "jsr:@std/semver@^1.0.3",
       "npm:@coderspirit/nominal@^4.1.1",
       "npm:@prefresh/core@^1.5.3",
       "npm:@prefresh/utils@^1.2.0",
       "npm:@prefresh/vite@^2.4.6",
       "npm:@xterm/xterm@^5.5.0",
+      "npm:acorn-walk@^8.3.4",
+      "npm:acorn@^8.14.0",
+      "npm:lebab@^3.2.6",
       "npm:preact-render-to-string@^6.5.6",
       "npm:preact@^10.22.1",
+      "npm:resolve.exports@^2.0.3",
       "npm:tailwindcss@^3.4.17",
+      "npm:validate-npm-package-name@6",
       "npm:vite@^6.0.3",
       "npm:zod@^3.24.1"
     ]

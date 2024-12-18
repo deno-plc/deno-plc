@@ -1,6 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC
+ * Deno-PLC HMI
  *
  * Copyright (C) 2024 Hans Schallmoser
  *
@@ -17,10 +17,43 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function App() {
+import { Header } from "./Header.tsx";
+import { PageRouter } from "./router.tsx";
+import { Nav } from "./Nav.tsx";
+import { ComponentChildren } from "preact";
+import { NotificationAggregator } from "./notifications/aggregator.tsx";
+import { LoadBar } from "./components/LoadBar.tsx";
+import { useLocation } from "@deno-plc/router";
+import { Workbench } from "./workbench/Workbench.tsx";
+
+export function App(p: {
+    children?: ComponentChildren;
+}) {
+    const location = useLocation().substring("/~".length);
+
+    if (location.toLowerCase().startsWith("workbench")) {
+        return <Workbench />;
+    }
     return (
-        <div>
-            <h1>App</h1>
+        <div class={`size-full bg-no-repeat absolute`} id={"app-main"}>
+            <div
+                class={`size-full flex flex-col items-stretch relative overflow-hidden backdrop-blur-[10vh] contrast-more:bg-black forced-colors:bg-black contrast-more:backdrop-blur-none`}
+            >
+                <LoadBar />
+                <Header title="Deno-PLC HMI" />
+                <div class={`grow flex flex-row relative overflow-hidden`}>
+                    <Nav />
+                    <div class={`grow relative overflow-hidden`}>
+                        <PageRouter children={p.children} />
+                    </div>
+
+                    <div
+                        class={`absolute bottom-0 right-0 py-4 pr-4 max-w-full max-h-full w-[26rem] min-h-4 flex flex-col overflow-y-auto overflow-x-hidden pointer-events-none`}
+                    >
+                        <NotificationAggregator />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
