@@ -49,7 +49,7 @@ export class Lock {
         });
     }
 
-    public get locked() {
+    public get locked(): boolean {
         return this.#locked;
     }
 

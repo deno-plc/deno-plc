@@ -21,10 +21,7 @@
     },
     "publish": {
         "exclude": [
-            ".github",
-            ".vscode",
-            "examples",
-            "src/array.ts"
+            "examples"
         ]
     }
 }
