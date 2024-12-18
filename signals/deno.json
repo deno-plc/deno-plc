@@ -1,5 +1,6 @@
 {
     "name": "@deno-plc/signals",
     "version": "0.0.1",
-    "exports": "./src/mod.ts"
+    "exports": "./src/mod.ts",
+    "license": "GPL-3.0"
 }

@@ -30,6 +30,10 @@ if (!self[preact_signals_brand]) {
 // @ts-ignore globals
 const impl = self[preact_signals_brand] as typeof preact_signals_current;
 
-export const { signal, effect, useComputed, useSignal, useSignalEffect } = impl;
+export const signal = impl.signal;
+export const effect = impl.effect;
+export const useComputed = impl.useComputed;
+export const useSignal = impl.useSignal;
+export const useSignalEffect = impl.useSignalEffect;
 
 export type { ReadonlySignal, Signal } from "npm:@preact/signals@^1.3.0";

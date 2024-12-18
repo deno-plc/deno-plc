@@ -3,5 +3,6 @@
     "version": "0.0.1",
     "exports": {
         "./ascii": "./src/ascii.ts"
-    }
+    },
+    "license": "GPL-3.0"
 }
