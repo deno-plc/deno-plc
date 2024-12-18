@@ -54,7 +54,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@^1.0.9",
-      "jsr:@std/encoding@^1.0.5"
+      "jsr:@std/encoding@^1.0.5",
+      "npm:@coderspirit/nominal@^4.1.1"
     ]
   }
 }

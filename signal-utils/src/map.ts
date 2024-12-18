@@ -28,7 +28,7 @@ import { signal } from "@deno-plc/signals";
  * All builtin Map methods work like `.value`.
  * Methods prefixed `peek_` work like `.peek()`
  */
-export class MapSignal<K, V> implements Map<K, V> {
+export class MapSignal<K, V> {
     constructor(initial?: Iterable<readonly [K, V]> | null | undefined) {
         this.#inner = new Map(initial);
     }

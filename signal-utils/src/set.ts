@@ -27,10 +27,8 @@ import { signal } from "@deno-plc/signals";
  *
  * All builtin Set methods work like `.value`.
  * Methods prefixed `peek_` work like `.peek()`.
- *
- * The Set composition methods are all stubs.
  */
-export class SetSignal<T> implements Set<T> {
+export class SetSignal<T> {
     constructor(initial?: Iterable<T> | null | undefined) {
         this.#inner = new Set(initial);
     }
@@ -159,48 +157,5 @@ export class SetSignal<T> implements Set<T> {
         this.#inner.clear();
         this.#trigger.value++;
         return this;
-    }
-
-    /**
-     * THIS IS A STUB
-     */
-    union<U>(_other: ReadonlySetLike<U>): Set<T | U> {
-        throw new Error("Composition is not supported on SetSignal");
-    }
-    /**
-     * THIS IS A STUB
-     */
-    intersection<U>(_other: ReadonlySetLike<U>): Set<T & U> {
-        throw new Error("Composition is not supported on SetSignal");
-    }
-    /**
-     * THIS IS A STUB
-     */
-    difference<U>(_other: ReadonlySetLike<U>): Set<T> {
-        throw new Error("Composition is not supported on SetSignal");
-    }
-    /**
-     * THIS IS A STUB
-     */
-    symmetricDifference<U>(_other: ReadonlySetLike<U>): Set<T | U> {
-        throw new Error("Composition is not supported on SetSignal");
-    }
-    /**
-     * THIS IS A STUB
-     */
-    isSubsetOf(_other: ReadonlySetLike<unknown>): boolean {
-        throw new Error("Composition is not supported on SetSignal");
-    }
-    /**
-     * THIS IS A STUB
-     */
-    isSupersetOf(_other: ReadonlySetLike<unknown>): boolean {
-        throw new Error("Composition is not supported on SetSignal");
-    }
-    /**
-     * THIS IS A STUB
-     */
-    isDisjointFrom(_other: ReadonlySetLike<unknown>): boolean {
-        throw new Error("Composition is not supported on SetSignal");
     }
 }
