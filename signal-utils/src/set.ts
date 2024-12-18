@@ -1,7 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- *
- * @Deno-PLC/signal-utils
+ * Deno-PLC
  *
  * Copyright (C) 2024 Hans Schallmoser
  *

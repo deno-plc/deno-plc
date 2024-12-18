@@ -17,19 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { effect } from "@deno-plc/signals";
-import { SetSignal } from "../src/set.ts";
-
-const list = new SetSignal();
-
-effect(() => {
-    if (list.size > 0) {
-        console.log(`The list contains: ${[...list].join(", ")}`);
-    } else {
-        console.log("The list is empty");
-    }
-}); // first run prints: The list is empty
-
-list.add("Apple"); // prints: The list contains: Apple
-list.add("Banana"); // prints: The list contains: Apple, Banana
-list.clear(); // prints: The list is empty
+export * from "./src/location.ts";
+export * from "./src/Link.tsx";
+export * from "./src/ssr.tsx";

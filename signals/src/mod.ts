@@ -32,6 +32,7 @@ const impl = self[preact_signals_brand] as typeof preact_signals_current;
 
 export const signal = impl.signal;
 export const effect = impl.effect;
+export const computed = impl.computed;
 export const useComputed = impl.useComputed;
 export const useSignal = impl.useSignal;
 export const useSignalEffect = impl.useSignalEffect;
