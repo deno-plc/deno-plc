@@ -1,0 +1,29 @@
+{
+    "name": "@deno-plc/signal-utils",
+    "version": "0.0.2",
+    "exports": {
+        "./async": "./src/async.ts",
+        "./map": "./src/map.ts",
+        "./set": "./src/set.ts",
+        "./timer": "./src/timer.ts"
+    },
+    "tasks": {
+        "check": "deno fmt && deno lint && deno publish --dry-run --allow-dirty",
+        "check-ci": "deno fmt --check && deno lint && deno publish --dry-run"
+    },
+    "lint": {
+        "rules": {
+            "exclude": [
+                "no-inferrable-types"
+            ]
+        }
+    },
+    "publish": {
+        "exclude": [
+            ".github",
+            ".vscode",
+            "examples",
+            "src/array.ts"
+        ]
+    }
+}

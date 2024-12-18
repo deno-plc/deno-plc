@@ -1,9 +1,11 @@
 {
     "workspace": [
         "./utils",
-        "./signals"
+        "./signals",
+        "./signal-utils"
     ],
     "imports": {
+        "@coderspirit/nominal": "npm:@coderspirit/nominal@^4.1.1",
         "@std/assert": "jsr:@std/assert@^1.0.9",
         "@std/encoding": "jsr:@std/encoding@^1.0.5"
     },
