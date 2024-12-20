@@ -78,8 +78,7 @@ export function Nav() {
         <div class={`basis-72 shrink-0 grow-0 border-r border-accent bg-bg-800 bg-opacity-60`}>
             <NavGroup title="App">
                 <NavLinkMs icon="house" href="/~home">Home</NavLinkMs>
-                <NavLinkMs icon="hub" href="/~nats-test">Mesh</NavLinkMs>
-                <NavLinkMs icon="update" href="/~deno-plc/update">Update</NavLinkMs>
+                <NavLinkMs icon="browse" href="/~workbench">Workbench</NavLinkMs>
             </NavGroup>
 
             <NavGroup title="Dashboard">

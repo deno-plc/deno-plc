@@ -22,6 +22,7 @@ import { useLocation } from "@deno-plc/router";
 import { useEffect } from "preact/hooks";
 import { getLogger } from "@logtape/logtape";
 import { LogPage } from "@deno-plc/ui/log";
+import { TestPage } from "./components/TestPage.tsx";
 
 const logger = getLogger(["app", "router"]);
 
@@ -90,6 +91,10 @@ export function PageRouter(p: {
 
     if (location.startsWith("deno-plc")) {
         return <DenoPLCRouter location={location.substring("deno-plc".length)} />;
+    }
+
+    if (location.startsWith("dash")) {
+        return <TestPage />;
     }
 
     return <E404></E404>;
