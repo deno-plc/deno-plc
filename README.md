@@ -7,6 +7,8 @@ It contains all the necessary building blocks to create a PLC/HMI application.
 Unlike most classic browser-based HMIs, this one actively uses modern Web APIs and therefore requires a secure context (self-signed TLS certificates
 are sufficient). The whole architecture is microservice-inspired to easily achieve redundancy.
 
+Please note that this software is GPL-licensed! [read why](./docs/why-gpl.md)
+
 ## The big picture
 
 @Deno-PLC can be considered a framework for PLC/HMIs. It defines a minimal setup to get the application working and provides many different packages
@@ -68,6 +70,8 @@ This package implements a user-customizable UI that is is inspired by VSCode and
 ## License
 
 Copyright (C) 2022-2024 Hans Schallmoser
+
+[read more about why is this GPL licensed](./docs/why-gpl.md)
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free
 Software Foundation, either version 3 of the License, or (at your option) any later version.
