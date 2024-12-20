@@ -21,7 +21,7 @@ import { Header } from "./Header.tsx";
 import { PageRouter } from "./router.tsx";
 import { Nav } from "./Nav.tsx";
 import { ComponentChildren } from "preact";
-import { NotificationAggregator } from "./notifications/aggregator.tsx";
+import { NotificationAggregator } from "@deno-plc/ui/notifications";
 import { LoadBar } from "./components/LoadBar.tsx";
 import { useLocation } from "@deno-plc/router";
 import { Workbench } from "./workbench/Workbench.tsx";

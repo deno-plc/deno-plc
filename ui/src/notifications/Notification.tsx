@@ -17,9 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ComponentChildren } from "preact";
-import { Ms } from "../misc/Ms.tsx";
-import { JSX as JSXInternal } from "preact/jsx-runtime";
+import type { ComponentChildren, VNode } from "preact";
+import { Ms } from "../icons/Ms.tsx";
+import type { JSX as JSXInternal } from "preact/jsx-runtime";
+
+export { NotificationAggregator } from "./aggregator.tsx";
 
 export enum NotifType {
     Info,
@@ -38,7 +40,7 @@ export function Notif(p: {
     icon?: ComponentChildren;
     onClick?: JSXInternal.MouseEventHandler<HTMLDivElement>;
     onClose?: JSXInternal.MouseEventHandler<HTMLDivElement>;
-}) {
+}): VNode {
     return (
         <div
             class={`overflow-hidden w-full transition-all duration-200 motion-reduce:transition-none shrink-0 grow-0 relative ${

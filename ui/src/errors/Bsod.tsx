@@ -1,6 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
  * Copyright (C) 2024 Hans Schallmoser
  *
@@ -17,13 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ComponentChildren } from "preact";
-import { VARIANT, VERSION } from "virtual:about-self";
-import { useSSRContext } from "../router/ssr.tsx";
+import type { ComponentChildren, VNode } from "preact";
+import { useSSRContext } from "@deno-plc/router";
 import { useEffect, useMemo } from "preact/hooks";
 import { MapSignal } from "@deno-plc/signal-utils/map";
-import { batch } from "@preact/signals";
-import { Panic } from "../../page/Panic.tsx";
+import { batch } from "@deno-plc/signals";
+import { Panic } from "./Panic.tsx";
 
 type VersionList = {
     brand: string;
@@ -57,7 +56,7 @@ export function Bsod(p: {
     errorcode: string;
     additional_context?: [ComponentChildren, ComponentChildren][];
     // stack?: string,
-}) {
+}): VNode {
     const ssr_ctx = useSSRContext();
     const system_info = useMemo(() => new MapSignal<string, string>(), []);
     useEffect(() => {
@@ -125,12 +124,9 @@ export function Bsod(p: {
                         Code: <span class={`font-mono text-xl`}>{p.errorcode}</span>
                     </div>
                     <div>
-                        Version: <span class={`font-mono text-xl`}>{VERSION}</span>
-                    </div>
-                    <div>
                         Mode:{" "}
                         <span class={`font-mono text-xl`}>
-                            {VARIANT}/{ssr_ctx.ssr ? `SSR` : `CSR`}
+                            {ssr_ctx.ssr ? `SSR` : `CSR`}
                         </span>
                     </div>
                     <div>
@@ -171,7 +167,7 @@ export function Bsod(p: {
 
 export function BsodText(p: {
     children: string;
-}) {
+}): VNode {
     return <>{p.children.split("\n").map(($) => <div>{$}</div>)}</>;
 }
 
@@ -180,7 +176,7 @@ export function BsodText(p: {
  */
 export function BsodTerminal(p: {
     children: string;
-}) {
+}): VNode {
     return <code class={`break-all whitespace-break-spaces`}>{p.children.split("\n").map(($) => <BsodTerminalLine>{$}</BsodTerminalLine>)}</code>;
 }
 
@@ -206,7 +202,7 @@ export function BsodFromAny(p: {
     error: unknown;
     errorcode?: string;
     children?: ComponentChildren;
-}) {
+}): VNode {
     if (p.error instanceof Panic) {
         return (
             <Bsod errorcode={p.error.code} additional_context={[["Runtime Mode", p.error.rt_mode]]}>

@@ -18,7 +18,7 @@
  */
 
 import { ComponentChildren } from "preact";
-import { Ms } from "./misc/Ms.tsx";
+import { Ms } from "@deno-plc/ui/icons-ms";
 import { navigate, useLocation } from "@deno-plc/router";
 
 function NavGroup(p: {

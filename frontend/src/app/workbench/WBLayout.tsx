@@ -32,7 +32,7 @@ import {
 import { LayoutModel, LayoutModelWindow, useLayoutModel } from "./LayoutMem.tsx";
 import { Vec2 } from "@deno-plc/utils/vec2";
 import { Rect } from "@deno-plc/utils/rect";
-import { Ms } from "../misc/Ms.tsx";
+import { Ms } from "@deno-plc/ui/icons-ms";
 import { contextMenuPosition } from "@deno-plc/utils/geometry";
 
 const MIN_CELL_SIZE = 100;

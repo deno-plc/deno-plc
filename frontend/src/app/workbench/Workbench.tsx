@@ -17,8 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Ms } from "../misc/Ms.tsx";
-import { NotificationAggregator } from "../notifications/aggregator.tsx";
+import { Ms } from "@deno-plc/ui/icons-ms";
+import { NotificationAggregator } from "@deno-plc/ui/notifications";
 import { clickedOutsideHandler } from "./ClickedOutside.tsx";
 import { MemoryCtxProvider } from "./LayoutMem.tsx";
 import {

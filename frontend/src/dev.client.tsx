@@ -17,6 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { GlobalPanic } from "@deno-plc/ui/errors";
+
 const log_config = configure({
     sinks: {
         console: getConsoleSink(),
@@ -46,7 +48,11 @@ import { configure, getConsoleSink } from "@logtape/logtape";
 import { App } from "./app/App.tsx";
 
 function Main() {
-    return <App />;
+    return (
+        <GlobalPanic>
+            <App />
+        </GlobalPanic>
+    );
 }
 
 async function init() {

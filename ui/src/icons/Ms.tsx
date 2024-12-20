@@ -1,6 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC
+ * Deno-PLC HMI
  *
  * Copyright (C) 2024 Hans Schallmoser
  *
@@ -16,3 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+import type { VNode } from "preact";
+
+export function Ms(p: {
+    children: string;
+    style?: "outlined" | "rounded" | "sharp";
+    fill?: boolean;
+    class?: string;
+}): VNode {
+    const icon_name = p.children.toLowerCase().replaceAll(/( |-)/g, "_");
+    return (
+        <i
+            class={`material-symbols-${p.style || "rounded"} ${p.class ?? ""} leading-none select-none`}
+            style={{
+                fontVariationSettings: p.fill ? `'FILL' 1` : "",
+            }}
+        >
+            {icon_name}
+        </i>
+    );
+}

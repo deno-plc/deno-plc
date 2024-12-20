@@ -27,6 +27,7 @@
         "@std/http": "jsr:@std/http@^1.0.12",
         "@std/path": "jsr:@std/path@^1.0.8",
         "@std/semver": "jsr:@std/semver@^1.0.3",
+        "@xterm/addon-fit": "npm:@xterm/addon-fit@^0.10.0",
         "@xterm/xterm": "npm:@xterm/xterm@^5.5.0",
         "acorn": "npm:acorn@^8.14.0",
         "acorn-walk": "npm:acorn-walk@^8.3.4",

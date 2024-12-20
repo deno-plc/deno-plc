@@ -41,8 +41,14 @@ vite_server.then((vite) => {
 
 const app = new Hono();
 
+app.use((c, next) => {
+    c.header("Cross-Origin-Opener-Policy", "same-origin");
+    c.header("Cross-Origin-Embedder-Policy", "credentialless");
+    return next();
+});
+
 app.get("/dev-assets/tailwind", async (c) => {
-    const play_code = await Deno.readTextFile("./frontend/src/style/play.tailwind.js");
+    const play_code = await Deno.readTextFile("./frontend/src/style/play.tailwind.js.bin");
     c.header("Content-Type", "text/javascript");
     return c.body(`${play_code};${await tailwind_config_code()}`);
 });

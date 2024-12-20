@@ -19,12 +19,9 @@
 
 import { ComponentChildren } from "preact";
 import { useLocation } from "@deno-plc/router";
-// import { LogPage } from "../log/Log.tsx";
 import { useEffect } from "preact/hooks";
 import { getLogger } from "@logtape/logtape";
-// import { FooPage } from "../misc/Foo.tsx";
-// import Logo from "../../img/Logo.tsx";
-// import { NatsTestPage } from "../components/nats_test/NatsTest.tsx";
+import { LogPage } from "@deno-plc/ui/log";
 
 const logger = getLogger(["app", "router"]);
 
@@ -72,7 +69,7 @@ function DenoPLCRouter({ location }: {
     location: string;
 }) {
     if (location === "/logs") {
-        // return <LogPage />;
+        return <LogPage />;
     }
 
     return <E404></E404>;
@@ -94,14 +91,6 @@ export function PageRouter(p: {
     if (location.startsWith("deno-plc")) {
         return <DenoPLCRouter location={location.substring("deno-plc".length)} />;
     }
-
-    // if (location.startsWith("dash/")) {
-    //     return <FooPage />;
-    // }
-
-    // if (location === "nats-test") {
-    //     return <NatsTestPage />;
-    // }
 
     return <E404></E404>;
 }

@@ -1,9 +1,8 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
  * Copyright (C) 2024 Hans Schallmoser
- * Copyright (C) 2024 Felix Beckh
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +17,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { signal } from "@deno-plc/signals";
-
-export const isFullscreen = signal(false);
-
-document.addEventListener("fullscreenchange", () => {
-    isFullscreen.value = !!document.fullscreenElement;
-});
-
-export function toggleFullscreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-    } else if (document.exitFullscreen) {
-        document.exitFullscreen();
-    }
-}
-
-export function leaveFullscreen() {
-    document.exitFullscreen();
-}
-
-export function enterFullscreen() {
-    document.documentElement.requestFullscreen();
-}
+export { LogPage } from "./Log.tsx";
+export { useTerminal } from "./Terminal.tsx";

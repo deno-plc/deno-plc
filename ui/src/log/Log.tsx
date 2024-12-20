@@ -18,12 +18,12 @@
  */
 
 import { MapSignal } from "@deno-plc/signal-utils/map";
-import { Signal, signal } from "@preact/signals-core";
-import { useComputed, useSignal } from "@preact/signals";
+import { type Signal, signal, useComputed, useSignal } from "@deno-plc/signals";
 import { useEffect } from "preact/hooks";
-import { useTerminal } from "../misc/Terminal.tsx";
+import { useTerminal } from "./Terminal.tsx";
 import { getLogs, truncatedLogs } from "./client_terminal.ts";
-import { useLocation } from "../router/location.tsx";
+import { useLocation } from "@deno-plc/router";
+import type { VNode } from "preact";
 
 const selfLogs = Symbol();
 const selfID = crypto.randomUUID();
@@ -48,7 +48,7 @@ logTerminals.set("foo", {
     id: "foo",
 });
 
-export function LogPage() {
+export function LogPage(): VNode {
     const active_id = useSignal("");
     const url = useLocation();
     useEffect(() => {

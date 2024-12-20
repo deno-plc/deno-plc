@@ -18,8 +18,8 @@
  */
 
 // import Logo from "../img/Logo.tsx";
-import { Ms } from "./misc/Ms.tsx";
-import { isFullscreen, toggleFullscreen } from "./misc/fullscreen.ts";
+import { Ms } from "@deno-plc/ui/icons-ms";
+import { isFullscreen, toggleFullscreen } from "@deno-plc/ui/fullscreen";
 
 export function Header(p: {
     title: string;

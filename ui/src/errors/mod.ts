@@ -1,6 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
  * Copyright (C) 2024 Hans Schallmoser
  *
@@ -17,21 +17,5 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function Ms(p: {
-    children: string;
-    style?: "outlined" | "rounded" | "sharp";
-    fill?: boolean;
-    class?: string;
-}) {
-    const icon_name = p.children.toLowerCase().replaceAll(/( |-)/g, "_");
-    return (
-        <i
-            class={`material-symbols-${p.style || "rounded"} ${p.class ?? ""} leading-none select-none`}
-            style={{
-                fontVariationSettings: p.fill ? `'FILL' 1` : "",
-            }}
-        >
-            {icon_name}
-        </i>
-    );
-}
+export { Bsod, BsodFromAny, BsodTerminal, BsodText } from "./Bsod.tsx";
+export { GlobalPanic, Panic, panic } from "./Panic.tsx";

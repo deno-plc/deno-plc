@@ -32,6 +32,7 @@
     "npm:@prefresh/utils@^1.2.0": "1.2.0",
     "npm:@prefresh/vite@^2.4.6": "2.4.6_preact@10.24.3_vite@6.0.3__@types+node@22.5.4_@types+node@22.5.4",
     "npm:@types/node@*": "22.5.4",
+    "npm:@xterm/addon-fit@0.10": "0.10.0_@xterm+xterm@5.5.0",
     "npm:@xterm/xterm@^5.5.0": "5.5.0",
     "npm:acorn-walk@^8.3.4": "8.3.4",
     "npm:acorn@^8.14.0": "8.14.0",
@@ -774,6 +775,12 @@
       "integrity": "sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==",
       "dependencies": [
         "undici-types"
+      ]
+    },
+    "@xterm/addon-fit@0.10.0_@xterm+xterm@5.5.0": {
+      "integrity": "sha512-UFYkDm4HUahf2lnEyHvio51TNGiLK66mqP2JoATy7hRZeXaGMRDr00JiSF7m63vR5WKATF605yEggJKsw0JpMQ==",
+      "dependencies": [
+        "@xterm/xterm"
       ]
     },
     "@xterm/xterm@5.5.0": {
@@ -1833,6 +1840,7 @@
       "npm:@prefresh/core@^1.5.3",
       "npm:@prefresh/utils@^1.2.0",
       "npm:@prefresh/vite@^2.4.6",
+      "npm:@xterm/addon-fit@0.10",
       "npm:@xterm/xterm@^5.5.0",
       "npm:acorn-walk@^8.3.4",
       "npm:acorn@^8.14.0",

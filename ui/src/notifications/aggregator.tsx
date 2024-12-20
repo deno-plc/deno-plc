@@ -17,26 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Bsod, BsodTerminal } from "./Bsod.tsx";
-import { useState } from "preact/hooks";
-import { panics } from "./fetch_panic.tsx";
+import type { VNode } from "preact";
 
-export function PanicDisplay() {
-    const [panic_id] = useState(0);
-    const panic = panics[panic_id];
+export function NotificationAggregator(): VNode {
     return (
-        <Bsod errorcode={`ERR_THREAD_PANIC #${panic_id}`}>
-            <p>
-                Thread <code>{panic.thread}</code> panicked at <code>{panic.file}:{panic.line}:{panic.col}</code>
-            </p>
-            <p class={`my-4`}>
-                <code>
-                    {panic.message}
-                </code>
-            </p>
-            <p class={`my-4  max-w-full`}>
-                <BsodTerminal>{panic.backtrace}</BsodTerminal>
-            </p>
-        </Bsod>
+        <>
+        </>
     );
 }

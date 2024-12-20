@@ -17,8 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ansiColorFormatter, Sink } from "@logtape/logtape";
-import { signal } from "@preact/signals-core";
+import { ansiColorFormatter, type Sink } from "@logtape/logtape";
+import { signal } from "@deno-plc/signals";
 
 const PAGE_SIZE = 20;
 const MAX_PAGE_DEFAULT = 60 / 20;

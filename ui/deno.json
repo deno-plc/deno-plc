@@ -1,5 +1,11 @@
 {
     "name": "@deno-plc/ui",
     "version": "0.1.0",
-    "exports": {}
+    "exports": {
+        "./errors": "./src/errors/mod.ts",
+        "./icons-ms": "./src/icons/Ms.tsx",
+        "./log": "./src/log/mod.ts",
+        "./fullscreen": "./src/misc/fullscreen.ts",
+        "./notifications": "./src/notifications/Notification.tsx"
+    }
 }

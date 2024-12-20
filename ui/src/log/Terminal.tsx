@@ -17,10 +17,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ITerminalOptions, Terminal } from "@xterm/xterm";
+import { type ITerminalOptions, Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
 import { useRef } from "preact/hooks";
-import { FunctionComponent } from "preact";
+import type { FunctionComponent } from "preact";
 
 export function useTerminal(conf?: () => ITerminalOptions): UseTerminal {
     const use = useRef<UseTerminal>();
