@@ -5,7 +5,7 @@ This is the core monorepo for @Deno-PLC. It is under active development and stil
 It contains all the necessary building blocks to create a PLC/HMI application.
 
 Unlike most classic browser-based HMIs, this one actively uses modern Web APIs and therefore requires a secure context (self-signed TLS certificates
-are sufficient). The whole architecture is microservice-inspired (if you prefer, you can use a single service).
+are sufficient). The whole architecture is microservice-inspired to easily achieve redundancy.
 
 ## The big picture
 
