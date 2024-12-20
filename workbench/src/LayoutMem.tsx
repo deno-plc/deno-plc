@@ -17,11 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ComponentChildren, createContext } from "preact";
+import { type ComponentChildren, createContext } from "preact";
 import { redirect, useLocation } from "@deno-plc/router";
 import { useContext, useEffect, useMemo } from "preact/hooks";
 import { z } from "zod";
-import { Signal, signal, useSignal } from "@deno-plc/signals";
+import { type Signal, signal, useSignal } from "@deno-plc/signals";
 
 const MemCtx = createContext<{
     model: LayoutModel | null;

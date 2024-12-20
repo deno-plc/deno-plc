@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { type JSX } from "preact";
+import type { JSX } from "preact";
 import { signal } from "@deno-plc/signals";
 
 const registration_update = signal(0);

@@ -24,7 +24,7 @@ import { ComponentChildren } from "preact";
 import { NotificationAggregator } from "@deno-plc/ui/notifications";
 import { LoadBar } from "./components/LoadBar.tsx";
 import { useLocation } from "@deno-plc/router";
-import { Workbench } from "./workbench/Workbench.tsx";
+import { Workbench } from "@deno-plc/workbench";
 
 export function App(p: {
     children?: ComponentChildren;

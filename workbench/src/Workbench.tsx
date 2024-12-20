@@ -30,8 +30,9 @@ import {
 } from "./registration.tsx";
 import { sidebar_active } from "./uistate.ts";
 import { WBLayout } from "./WBLayout.tsx";
+import type { VNode } from "preact";
 
-export function Workbench() {
+export function Workbench(): VNode {
     useRegistrationUpdate();
     const Sidebar_component = $pub_crate$_sidebar_tabs.get(sidebar_active.value)?.component ?? (() => <div>No Tab selected</div>);
     return (

@@ -5,7 +5,8 @@
         "./signal-utils",
         "./router",
         "./frontend",
-        "./ui"
+        "./ui",
+        "./workbench"
     ],
     "tasks": {
         "check": "deno fmt & deno lint & deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run --allow-dirty",

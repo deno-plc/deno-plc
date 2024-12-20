@@ -19,17 +19,17 @@
 
 import { useContext, useEffect, useMemo, useRef } from "preact/hooks";
 import { effect, signal, useSignal } from "@deno-plc/signals";
-import { ComponentChildren, createContext } from "preact";
+import { type ComponentChildren, createContext } from "preact";
 import { BgCanvas } from "./GridCanvas.tsx";
 import {
     $pub_crate$_main_views,
-    MainViewComponentProps,
-    MainViewContextComponent,
+    type MainViewComponentProps,
+    type MainViewContextComponent,
     registerBottomBarItem,
     registerMainView,
     useRegistrationUpdate,
 } from "./registration.tsx";
-import { LayoutModel, LayoutModelWindow, useLayoutModel } from "./LayoutMem.tsx";
+import { type LayoutModel, type LayoutModelWindow, useLayoutModel } from "./LayoutMem.tsx";
 import { Vec2 } from "@deno-plc/utils/vec2";
 import { Rect } from "@deno-plc/utils/rect";
 import { Ms } from "@deno-plc/ui/icons-ms";

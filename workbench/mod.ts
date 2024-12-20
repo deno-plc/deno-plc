@@ -17,24 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { ComponentChildren } from "preact";
-
-export function Menu(p: {
-    children: ComponentChildren;
-}) {
-    return (
-        <div>
-            {p.children}
-        </div>
-    );
-}
-
-export function MenuItem(p: {
-    children: ComponentChildren;
-}) {
-    return (
-        <div>
-            {p.children}
-        </div>
-    );
-}
+export { Workbench } from "./src/Workbench.tsx";
+export { registerBottomBarItem, registerMainView, registerSidebarTab } from "./src/registration.tsx";
+export type { BottomBarItem, MainView, MainViewComponentProps, MainViewContextComponent, SidebarTab } from "./src/registration.tsx";
