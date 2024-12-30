@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC HMI
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@
 import type { ComponentChildren, VNode } from "preact";
 import { Ms } from "../icons/Ms.tsx";
 import type { JSX as JSXInternal } from "preact/jsx-runtime";
-
-export { NotificationAggregator } from "./aggregator.tsx";
 
 export enum NotifType {
     Info,

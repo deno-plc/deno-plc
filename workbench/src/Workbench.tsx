@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  */
 
 import { Ms } from "@deno-plc/ui/icons-ms";
-import { NotificationAggregator } from "@deno-plc/ui/notifications";
 import { clickedOutsideHandler } from "./ClickedOutside.tsx";
 import { MemoryCtxProvider } from "./LayoutMem.tsx";
 import {
@@ -30,9 +29,11 @@ import {
 } from "./registration.tsx";
 import { sidebar_active } from "./uistate.ts";
 import { WBLayout } from "./WBLayout.tsx";
-import type { VNode } from "preact";
+import type { ComponentChildren, VNode } from "preact";
 
-export function Workbench(): VNode {
+export function Workbench(p: {
+    notification_aggregator?: ComponentChildren;
+}): VNode {
     useRegistrationUpdate();
     const Sidebar_component = $pub_crate$_sidebar_tabs.get(sidebar_active.value)?.component ?? (() => <div>No Tab selected</div>);
     return (
@@ -90,7 +91,7 @@ export function Workbench(): VNode {
                 <div
                     class={`absolute bottom-10 right-0 py-4 pr-4 max-w-full max-h-full w-[26rem] min-h-4 flex flex-col overflow-y-auto overflow-x-hidden pointer-events-none`}
                 >
-                    <NotificationAggregator />
+                    {p.notification_aggregator}
                 </div>
             </div>
         </MemoryCtxProvider>

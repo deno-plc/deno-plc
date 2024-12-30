@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC HMI
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import { Header } from "./Header.tsx";
 import { PageRouter } from "./router.tsx";
 import { Nav } from "./Nav.tsx";
 import { ComponentChildren } from "preact";
-import { NotificationAggregator } from "@deno-plc/ui/notifications";
+import { NotificationAggregator } from "./NotificationAggregator.tsx";
 import { LoadBar } from "./components/LoadBar.tsx";
 import { useLocation } from "@deno-plc/router";
 import { Workbench } from "@deno-plc/workbench";
@@ -32,7 +32,7 @@ export function App(p: {
     const location = useLocation().substring("/~".length);
 
     if (location.toLowerCase().startsWith("workbench")) {
-        return <Workbench />;
+        return <Workbench notification_aggregator={<NotificationAggregator />} />;
     }
     return (
         <div class={`size-full bg-no-repeat absolute`} id={"app-main"}>
