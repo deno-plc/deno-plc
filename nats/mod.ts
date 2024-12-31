@@ -31,6 +31,7 @@ import { nats_client, NATS_Status, nats_status } from "./state_container.ts";
 import { assert } from "@std/assert/assert";
 import { wait } from "@deno-plc/utils/wait";
 import { getLogger } from "@logtape/logtape";
+import { type Signal, signal } from "../signals/src/mod.ts";
 
 export { NATS_Status, nats_status } from "./state_container.ts";
 
@@ -39,6 +40,13 @@ export function get_nats(): Promise<NatsClient> {
 }
 
 const logger = getLogger(["app", "nats"]);
+
+const $pub_crate$_constructor = Symbol();
+const $pub_crate$_subscriptions = Symbol();
+
+const subscription_registry = new FinalizationRegistry((subject) => {
+    logger.warn`a subscription for ${subject} was not disposed correctly. This leads to memory leaks.`;
+});
 
 /**
  * Handles the initialization of the process global NATS client.
@@ -131,5 +139,101 @@ export class NatsClient {
 
     requestMany(subject: string, payload?: Payload, opts?: Partial<RequestManyOptions>): Promise<AsyncIterable<Msg>> {
         return this.core.requestMany(subject, payload, opts);
+    }
+
+    [$pub_crate$_subscriptions] = new Map<string, BlobSubscriptionInner>();
+
+    subscribe_blob(subject: string, opt: SubscribeBlobOptions): BlobSubscription {
+        let inner: BlobSubscriptionInner;
+        if (this[$pub_crate$_subscriptions].has(subject)) {
+            inner = this[$pub_crate$_subscriptions].get(subject)!;
+        } else {
+            inner = new BlobSubscriptionInner(this, subject, opt);
+            this[$pub_crate$_subscriptions].set(subject, inner);
+        }
+        return BlobSubscription[$pub_crate$_constructor](inner);
+    }
+}
+
+/**
+ * Options for subscribing to a blob
+ */
+export interface SubscribeBlobOptions {
+    /**
+     * The maximum size of the blob in bytes, more will be truncated
+     * This option is only evaluated on the first subscription to a subject
+     */
+    max_size: number;
+
+    /** */
+    fetch?: boolean;
+}
+
+class BlobSubscriptionInner {
+    constructor(readonly client: NatsClient, readonly subject: string, readonly opt: SubscribeBlobOptions) {
+        this.buffer = new ArrayBuffer(opt.max_size);
+        this.value = signal(new Uint8Array(this.buffer));
+
+        this.#subscription = client.subscribe(`%blob_sink_raw%.${subject}`);
+
+        this.#run().then();
+    }
+
+    async #run() {
+        for await (const msg of this.#subscription) {
+            const data = msg.data as Uint8Array;
+            const len = Math.min(data.length, this.buffer.byteLength);
+            // update data
+            new Uint8Array(this.buffer).set(data.subarray(0, len));
+            // trigger signal update
+            this.value.value = new Uint8Array(this.buffer, 0, len);
+        }
+    }
+
+    #subscription: Subscription;
+    readonly buffer: ArrayBuffer;
+    readonly value: Signal<Uint8Array>;
+    instances = 0;
+
+    try_dispose() {
+        if (this.instances === 0) {
+            this.client[$pub_crate$_subscriptions].delete(this.subject);
+            this.#subscription.unsubscribe();
+        }
+    }
+}
+
+export class BlobSubscription {
+    #reg_id = Symbol();
+    private constructor(private readonly inner: BlobSubscriptionInner) {
+        this.inner.instances++;
+        subscription_registry.register(this, this.inner.subject, this.#reg_id);
+    }
+    static [$pub_crate$_constructor](inner: BlobSubscriptionInner): BlobSubscription {
+        return new BlobSubscription(inner);
+    }
+
+    /**
+     * Access the value. This is @preact/signals hook compatible
+     */
+    get value(): Uint8Array {
+        return this.inner.value.value;
+    }
+
+    public peek(): Uint8Array {
+        return this.inner.value.peek();
+    }
+
+    [Symbol.dispose]() {
+        this.inner.instances--;
+        subscription_registry.unregister(this.#reg_id);
+        // in hooks the old values are dropped first, so we need to wait a bit in case the subscription is used again
+        setTimeout(() => {
+            this.inner.try_dispose();
+        }, 10);
+    }
+
+    dispose() {
+        this[Symbol.dispose]();
     }
 }
