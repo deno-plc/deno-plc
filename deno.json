@@ -9,15 +9,15 @@
         "./workbench"
     ],
     "tasks": {
-        "check": "deno fmt & deno lint & deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run --allow-dirty",
-        "check-ci": "deno fmt --check & deno lint & deno run --allow-read --allow-run=git scripts/license-bot.ts & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run",
-        "check:license": "deno run --allow-read --allow-write scripts/license-bot.ts",
-        "check:spell": "deno run -A npm:cspell@^8.14.2 lint . --no-progress",
+        "check": "deno fmt & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run --allow-dirty",
+        "check-ci": "deno fmt --check & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run",
+        "check:license": "deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts",
+        "check:spell": "deno run -A npm:cspell@^8.14.2 lint .",
         "dev": "deno run -A frontend/src/dev.ts"
     },
     "imports": {
         "@coderspirit/nominal": "npm:@coderspirit/nominal@^4.1.1",
-        "@deno-plc/vite-plugin-deno": "../vite-plugin-deno/mod.ts",
+        "@deno-plc/vite-plugin-deno": "../../vite-plugin-deno/mod.ts",
         "@luca/cases": "jsr:@luca/cases@^1.0.0",
         "@nats-io/nats-core": "jsr:@nats-io/nats-core@^3.0.0-48",
         "@prefresh/core": "npm:@prefresh/core@^1.5.3",
