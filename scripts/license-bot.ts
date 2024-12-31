@@ -19,7 +19,6 @@
 
 import { walkSync } from "@std/fs";
 import { assert } from "@std/assert/assert";
-import { parseArgs } from "@std/cli/parse-args";
 import { join } from "@std/path";
 
 // make sure that the line endings are LF
@@ -41,7 +40,7 @@ async function getModifiedFiles(): Promise<string[]> {
 
     const modifiedFiles = statusOutput
         .split("\n")
-        .map(line => join(Deno.cwd(), line.slice(3).trim()));
+        .map((line) => join(Deno.cwd(), line.slice(3).trim()));
 
     return modifiedFiles;
 }
@@ -82,11 +81,11 @@ class CheckedFile {
             console.log(`modified: ${path}`);
         }
         this.lang = path.endsWith(".rs") ? "rust" : "typescript";
-
     }
     async check() {
         const content = await Deno.readTextFile(this.path);
-        const licenseRegex = /\/\*\*\s*\n\s*\*\s*@license\s*GPL-3.0-or-later\s*\n\s*\*.*?\n\s*(\*\s*Copyright\s*\(C\)\s*(\d{4}(?:\s*-\s*\d{4})?(?:,\s*\d{4}(?:\s*-\s*\d{4})?)*)\s*(.*?)\n\s*)+\*\s*This\s*program\s*is\s*free\s*software.*?\n\s*\*\s*along\s*with\s*this\s*program.*?\n\s*\*\/\s*/gs;
+        const licenseRegex =
+            /\/\*\*\s*\n\s*\*\s*@license\s*GPL-3.0-or-later\s*\n\s*\*.*?\n\s*(\*\s*Copyright\s*\(C\)\s*(\d{4}(?:\s*-\s*\d{4})?(?:,\s*\d{4}(?:\s*-\s*\d{4})?)*)\s*(.*?)\n\s*)+\*\s*This\s*program\s*is\s*free\s*software.*?\n\s*\*\s*along\s*with\s*this\s*program.*?\n\s*\*\/\s*/gs;
         const matches = content.matchAll(licenseRegex);
 
         for (const match of matches) {
@@ -94,15 +93,15 @@ class CheckedFile {
             if (copyrightLines) {
                 for (const line of copyrightLines) {
                     const [, years, author] = line.match(/Copyright\s*\(C\)\s*(\d{4}(?:\s*-\s*\d{4})?(?:,\s*\d{4}(?:\s*-\s*\d{4})?)*)\s*(.*?)\n/)!;
-                    const yearList = years.split(/,\s*/).flatMap(yearRange => {
-                        const [start, end] = yearRange.split('-').map(Number);
+                    const yearList = years.split(/,\s*/).flatMap((yearRange) => {
+                        const [start, end] = yearRange.split("-").map(Number);
                         return end ? Array.from({ length: end - start + 1 }, (_, i) => start + i) : [start];
                     });
 
                     if (!this.authors_modified.has(author)) {
                         this.authors_modified.set(author, new Set());
                     }
-                    yearList.forEach(year => this.authors_modified.get(author)!.add(year));
+                    yearList.forEach((year) => this.authors_modified.get(author)!.add(year));
                 }
             }
         }
@@ -114,7 +113,7 @@ class CheckedFile {
 
         if (this.modified) {
             const this_year = new Date().getFullYear();
-            const years = [...this.authors_modified.values()].flatMap(set => [...set]);
+            const years = [...this.authors_modified.values()].flatMap((set) => [...set]);
             assert(years.includes(this_year));
 
             console.log(`authors_modified: ${JSON.stringify([...this.authors_modified].map(([author, years]) => [author, [...years]]))}`);
@@ -123,7 +122,6 @@ class CheckedFile {
 }
 
 await new LicenseChecker().check();
-
 
 // let errors = 0;
 // let fixes = 0;

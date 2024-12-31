@@ -6,10 +6,11 @@
         "./router",
         "./frontend",
         "./ui",
+        "./nats",
         "./workbench"
     ],
     "tasks": {
-        "check": "deno fmt & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run --allow-dirty",
+        "check": "deno fmt & deno lint --fix & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run --allow-dirty",
         "check-ci": "deno fmt --check & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno publish --dry-run",
         "check:license": "deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts",
         "check:spell": "deno run -A npm:cspell@^8.14.2 lint .",

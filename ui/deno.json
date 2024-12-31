@@ -4,8 +4,10 @@
     "exports": {
         "./errors": "./src/errors/mod.ts",
         "./icons-ms": "./src/icons/Ms.tsx",
-        "./log": "./src/log/mod.ts",
         "./fullscreen": "./src/misc/fullscreen.ts",
-        "./notifications": "./src/notifications/Notification.tsx"
+        "./notifications": "./src/notifications/Notification.tsx",
+        "./nats": "./src/nats/nats.tsx",
+        "./console": "./src/console/console.ts",
+        "./console/client-terminal": "./src/console/client_terminal.ts"
     }
 }

@@ -21,7 +21,7 @@ import { ComponentChildren } from "preact";
 import { useLocation } from "@deno-plc/router";
 import { useEffect } from "preact/hooks";
 import { getLogger } from "@logtape/logtape";
-import { LogPage } from "@deno-plc/ui/log";
+import { LogPage } from "@deno-plc/ui/console";
 import { TestPage } from "./components/TestPage.tsx";
 
 const logger = getLogger(["app", "router"]);

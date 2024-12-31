@@ -2,7 +2,6 @@
   "version": "4",
   "specifiers": {
     "jsr:@hono/hono@^4.6.14": "4.6.14",
-    "jsr:@logtape/logtape@0.8": "0.8.0",
     "jsr:@luca/cases@1": "1.0.0",
     "jsr:@nats-io/nats-core@^3.0.0-48": "3.0.0-48",
     "jsr:@nats-io/nkeys@~2.0.0-3": "2.0.0",
@@ -52,9 +51,6 @@
   "jsr": {
     "@hono/hono@4.6.14": {
       "integrity": "b39a5488266adf448fb1081bc3071a0d05145e72f3ab3ff83cf140e780c6c1de"
-    },
-    "@logtape/logtape@0.8.0": {
-      "integrity": "12bdf406a713f754d99c2ff65deb45127ce4e2c59e7136d608042250629428bd"
     },
     "@luca/cases@1.0.0": {
       "integrity": "b5f9471f1830595e63a2b7d62821ac822a19e16899e6584799be63f17a1fbc30"
@@ -1819,6 +1815,7 @@
     "https://cdn.jsdelivr.net/npm/is-generator-function@1.0.10/+esm": "a9d4921df6189a14f2461a673093557e769d4a5730e4b70dbd75cb3620cf4de9",
     "https://cdn.jsdelivr.net/npm/is-typed-array@1.1.13/+esm": "83abe040f55809bb9fafc7d057fd6eb1f74534c30cb2244fe52d47efd9c5f960",
     "https://cdn.jsdelivr.net/npm/set-function-length@1.2.1/+esm": "4a1e584a611d3942a9e17b1f66e51df558bf83044546208803c53bae48f689c0",
+    "https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/+esm": "e935b8e8112d19abc4258bb6ff08829432a7b6a95b1110d1a30a55a8b5e21614",
     "https://cdn.jsdelivr.net/npm/util@0.12.5/+esm": "3bdfd03be96f9a76614102cefaf6c838fb80fc269c26356ab1020e878fe4becb",
     "https://cdn.jsdelivr.net/npm/which-typed-array@1.1.14/+esm": "9612d09046ba6d378cfa21f1f865bebce0224dec69c643f6f08c19ccd45ecabc",
     "https://deno.land/x/simple_promise_lock@v2.2.1/deno/lock.ts": "b99ef1ee40225c04850da84cb198dcee5993235d68975c14ab63592c5e4656e4"

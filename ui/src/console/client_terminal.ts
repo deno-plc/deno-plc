@@ -1,6 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
  * Copyright (C) 2024 Hans Schallmoser
  *
@@ -18,7 +18,7 @@
  */
 
 import { ansiColorFormatter, type Sink } from "@logtape/logtape";
-import { signal } from "@deno-plc/signals";
+import { type Signal, signal } from "@deno-plc/signals";
 
 const PAGE_SIZE = 20;
 const MAX_PAGE_DEFAULT = 60 / 20;
@@ -33,11 +33,11 @@ const MAX_PAGES = (() => {
 
 const records: string[][] = [[]];
 
-export const truncatedLogs = signal(0);
+export const truncatedLogs: Signal<number> = signal(0);
 
 const listener = new Set<(rec: string) => void>();
 
-export function getLogs(cb: (rec: string) => void) {
+export function getLogs(cb: (rec: string) => void): VoidFunction {
     listener.add(cb);
     for (const page of records) {
         for (const rec of page) {

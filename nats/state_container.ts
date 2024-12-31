@@ -17,5 +17,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export { LogPage } from "./Log.tsx";
-export { useTerminal } from "./Terminal.tsx";
+import { OnceLock } from "@deno-plc/utils/once_lock";
+import { type Signal, signal } from "@deno-plc/signals";
+import type { NatsClient } from "./mod.ts";
+
+// #[non_exhaustive]
+export enum NATS_Status {
+    NotConfigured,
+    Connecting,
+    Connected,
+    Disconnected,
+    Reconnecting,
+    Error,
+}
+
+export const nats_client = new OnceLock<NatsClient>();
+export const nats_status: Signal<NATS_Status> = signal(NATS_Status.NotConfigured);

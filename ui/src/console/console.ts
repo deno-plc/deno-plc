@@ -1,8 +1,8 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
- * Copyright (C) 2024 - 2025 Hans Schallmoser
+ * Copyright (C) 2024 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { VNode } from "preact";
-import { NATSStatus } from "@deno-plc/ui/nats";
-export function NotificationAggregator(): VNode {
-    return (
-        <>
-            <NATSStatus />
-        </>
-    );
-}
+export * from "./client_terminal.ts";
+
+export { LogPage } from "./Terminal.tsx";

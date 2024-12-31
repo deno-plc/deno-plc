@@ -17,35 +17,41 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { GlobalPanic } from "@deno-plc/ui/errors";
+import { clientTerminal } from "@deno-plc/ui/console/client-terminal";
+import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
+
+const logger = getLogger(["app"]);
 
 const log_config = configure({
     sinks: {
         console: getConsoleSink(),
+        clientTerminal,
     },
     loggers: [
         {
             category: "app",
-            level: "debug",
-            sinks: ["console"],
+            lowestLevel: "debug",
+            sinks: ["console", "clientTerminal"],
         },
         {
             category: ["app_nc"],
-            level: "debug",
-            sinks: [],
+            lowestLevel: "debug",
+            sinks: ["clientTerminal"],
         },
         {
             category: ["logtape", "meta"],
-            level: "debug",
-            sinks: ["console"],
+            lowestLevel: "debug",
+            sinks: ["console", "clientTerminal"],
         },
     ],
     reset: true,
 });
 
+import { GlobalPanic } from "@deno-plc/ui/errors";
 import { render } from "preact";
-import { configure, getConsoleSink } from "@logtape/logtape";
 import { App } from "./app/App.tsx";
+import { init_nats } from "@deno-plc/nats";
+import { wsconnect } from "@nats-io/nats-core";
 
 function Main() {
     return (
@@ -59,6 +65,9 @@ async function init() {
     await log_config;
     document.body.innerHTML = "";
     render(<Main />, document.body);
+
+    init_nats(wsconnect.bind(self, { servers: ["ws://localhost:1001"] }));
+    logger.info`initialized`;
 }
 
 addEventListener("load", init);

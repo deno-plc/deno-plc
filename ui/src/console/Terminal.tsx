@@ -1,6 +1,6 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
  * Copyright (C) 2024 Hans Schallmoser
  *
@@ -20,8 +20,8 @@
 import { MapSignal } from "@deno-plc/signal-utils/map";
 import { type Signal, signal, useComputed, useSignal } from "@deno-plc/signals";
 import { useEffect } from "preact/hooks";
-import { useTerminal } from "./Terminal.tsx";
-import { getLogs, truncatedLogs } from "./client_terminal.ts";
+import { useTerminal } from "../terminal/Terminal.tsx";
+import { getLogs, truncatedLogs } from "./console.ts";
 import { useLocation } from "@deno-plc/router";
 import type { VNode } from "preact";
 
@@ -40,12 +40,6 @@ logTerminals.set(selfID, {
     label: signal("Client application"),
     src: selfLogs,
     id: selfID,
-});
-
-logTerminals.set("foo", {
-    label: signal("Client 2"),
-    src: new URL("http://localhost/dev-api/logs"),
-    id: "foo",
 });
 
 export function LogPage(): VNode {
