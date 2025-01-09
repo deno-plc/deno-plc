@@ -44,7 +44,7 @@ const logger = getLogger(["app", "nats"]);
 const $pub_crate$_constructor: unique symbol = Symbol();
 const $pub_crate$_subscriptions: unique symbol = Symbol();
 
-const subscription_registry = new FinalizationRegistry((subject) => {
+const subscription_registry = new FinalizationRegistry<string>((subject) => {
     logger.warn`a subscription for ${subject} was not disposed correctly. This leads to memory leaks.`;
 });
 
