@@ -30,23 +30,15 @@ import type {
 import { nats_client, NATS_Status, nats_status } from "./state_container.ts";
 import { assert } from "@std/assert/assert";
 import { wait } from "@deno-plc/utils/wait";
-import { getLogger } from "@logtape/logtape";
-import { type Signal, signal } from "../signals/src/mod.ts";
+import { logger } from "./src/shared.ts";
+import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor } from "./src/pub_crate.ts";
+import { BlobSource, BlobSubscriptionInner, type SubscribeBlobOptions } from "./src/blob.sink.ts";
 
 export { NATS_Status, nats_status } from "./state_container.ts";
 
 export function get_nats(): Promise<NatsClient> {
     return nats_client.get();
 }
-
-const logger = getLogger(["app", "nats"]);
-
-const $pub_crate$_constructor: unique symbol = Symbol();
-const $pub_crate$_subscriptions: unique symbol = Symbol();
-
-const subscription_registry = new FinalizationRegistry<string>((subject) => {
-    logger.warn`a subscription for ${subject} was not disposed correctly. This leads to memory leaks.`;
-});
 
 /**
  * Handles the initialization of the process global NATS client.
@@ -141,99 +133,19 @@ export class NatsClient {
         return this.core.requestMany(subject, payload, opts);
     }
 
-    [$pub_crate$_subscriptions]: Map<string, BlobSubscriptionInner> = new Map();
+    [$pub_crate$_blob_subscriptions]: Map<string, BlobSubscriptionInner> = new Map();
 
-    subscribe_blob(subject: string, opt: SubscribeBlobOptions): BlobSubscription {
+    blob_sink(subject: string, opt: SubscribeBlobOptions): BlobSource {
         let inner: BlobSubscriptionInner;
-        if (this[$pub_crate$_subscriptions].has(subject)) {
-            inner = this[$pub_crate$_subscriptions].get(subject)!;
+        if (this[$pub_crate$_blob_subscriptions].has(subject)) {
+            inner = this[$pub_crate$_blob_subscriptions].get(subject)!;
         } else {
             inner = new BlobSubscriptionInner(this, subject, opt);
-            this[$pub_crate$_subscriptions].set(subject, inner);
+            this[$pub_crate$_blob_subscriptions].set(subject, inner);
         }
-        return BlobSubscription[$pub_crate$_constructor](inner);
+        return BlobSource[$pub_crate$_constructor](inner);
     }
 }
 
-/**
- * Options for subscribing to a blob
- */
-export interface SubscribeBlobOptions {
-    /**
-     * The maximum size of the blob in bytes, more will be truncated
-     * This option is only evaluated on the first subscription to a subject
-     */
-    max_size: number;
-
-    /** */
-    fetch?: boolean;
-}
-
-class BlobSubscriptionInner {
-    constructor(readonly client: NatsClient, readonly subject: string, readonly opt: SubscribeBlobOptions) {
-        this.buffer = new ArrayBuffer(opt.max_size);
-        this.value = signal(new Uint8Array(this.buffer));
-
-        this.#subscription = client.subscribe(`%blob_sink_raw%.${subject}`);
-
-        this.#run().then();
-    }
-
-    async #run() {
-        for await (const msg of this.#subscription) {
-            const data = msg.data as Uint8Array;
-            const len = Math.min(data.length, this.buffer.byteLength);
-            // update data
-            new Uint8Array(this.buffer).set(data.subarray(0, len));
-            // trigger signal update
-            this.value.value = new Uint8Array(this.buffer, 0, len);
-        }
-    }
-
-    #subscription: Subscription;
-    readonly buffer: ArrayBuffer;
-    readonly value: Signal<Uint8Array>;
-    instances = 0;
-
-    try_dispose() {
-        if (this.instances === 0) {
-            this.client[$pub_crate$_subscriptions].delete(this.subject);
-            this.#subscription.unsubscribe();
-        }
-    }
-}
-
-export class BlobSubscription {
-    #reg_id = Symbol();
-    private constructor(private readonly inner: BlobSubscriptionInner) {
-        this.inner.instances++;
-        subscription_registry.register(this, this.inner.subject, this.#reg_id);
-    }
-    static [$pub_crate$_constructor](inner: BlobSubscriptionInner): BlobSubscription {
-        return new BlobSubscription(inner);
-    }
-
-    /**
-     * Access the value. This is @preact/signals hook compatible
-     */
-    get value(): Uint8Array {
-        return this.inner.value.value;
-    }
-
-    public peek(): Uint8Array {
-        return this.inner.value.peek();
-    }
-
-    [Symbol.dispose]() {
-        this.inner.instances--;
-        subscription_registry.unregister(this.#reg_id);
-        // in hooks the old values are dropped first, so we need to wait a bit in case the subscription is used again
-        setTimeout(() => {
-            this.inner.try_dispose();
-        }, 10);
-    }
-
-    dispose() {
-        this[Symbol.dispose]();
-    }
-}
+export { BlobSource } from "./src/blob.sink.ts";
+export type { SubscribeBlobOptions } from "./src/blob.sink.ts";
