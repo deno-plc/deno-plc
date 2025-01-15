@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { JSX } from "preact";
+import type { VNode } from "preact";
 import { signal } from "@deno-plc/signals";
 
 const registration_update = signal(0);
@@ -30,7 +30,7 @@ export interface SidebarTab {
     id: string;
     icon: string;
     name: string;
-    component: () => JSX.Element;
+    component: () => VNode;
 }
 
 export const $pub_crate$_sidebar_tabs = new Map<string, SidebarTab>();
@@ -51,15 +51,18 @@ export interface MainViewComponentProps {
     onContextMenu: (e: MouseEvent) => void;
 }
 
-export type MainViewContextComponent = (p: {
+export interface MainViewContextComponentProps {
     close_window: () => void;
-}) => JSX.Element;
+    close_context_menu: () => void;
+}
+
+export type MainViewContextComponent = (p: MainViewContextComponentProps) => VNode;
 
 export interface MainView {
     id: string;
     icon: string;
     name: string;
-    component: (p: MainViewComponentProps) => JSX.Element;
+    component: (p: MainViewComponentProps) => VNode;
     contextMenu: MainViewContextComponent;
 }
 
@@ -72,7 +75,7 @@ export function registerMainView(view: MainView) {
 
 export interface BottomBarItem {
     id: string;
-    component: () => JSX.Element;
+    component: () => VNode;
 }
 
 export const $pub_crate$_bottom_bar_items = new Map<string, BottomBarItem>();

@@ -20,22 +20,18 @@
 import { Ms } from "@deno-plc/ui/icons-ms";
 import { clickedOutsideHandler } from "./ClickedOutside.tsx";
 import { MemoryCtxProvider } from "./LayoutMem.tsx";
-import {
-    $pub_crate$_bottom_bar_items,
-    $pub_crate$_main_views,
-    $pub_crate$_sidebar_tabs,
-    registerSidebarTab,
-    useRegistrationUpdate,
-} from "./registration.tsx";
+import { $pub_crate$_bottom_bar_items, $pub_crate$_sidebar_tabs, registerSidebarTab, useRegistrationUpdate } from "./registration.tsx";
 import { sidebar_active } from "./uistate.ts";
-import { WBLayout } from "./WBLayout.tsx";
+import { GridGeometryInfo, WBLayout } from "./WBLayout.tsx";
 import type { ComponentChildren, VNode } from "preact";
+import { useSignal } from "@deno-plc/signals";
 
 export function Workbench(p: {
     notification_aggregator?: ComponentChildren;
 }): VNode {
     useRegistrationUpdate();
     const Sidebar_component = $pub_crate$_sidebar_tabs.get(sidebar_active.value)?.component ?? (() => <div>No Tab selected</div>);
+    const grid = useSignal(GridGeometryInfo.null());
     return (
         <MemoryCtxProvider>
             <div class={`size-full absolute`} onClick={clickedOutsideHandler}>
@@ -74,7 +70,17 @@ export function Workbench(p: {
                             <Sidebar_component />
                         </div>
                         <div class={`grow relative overflow-hidden`}>
-                            <WBLayout />
+                            <WBLayout
+                                onGridUpdate={(geo) => {
+                                    grid.value = geo;
+                                }}
+                            />
+                        </div>
+                        <div class={`basis-24 bg-bg-800 border-accent border-l flex flex-col items-stretch`}>
+                            {Array(grid.value.rows).fill(0).map(() => (
+                                <div class={`grow relative overflow-hidden border-accent border-b last-of-type:border-b-0`}>
+                                </div>
+                            ))}
                         </div>
                     </div>
                     <div class={`w-full basis-10 border-t border-accent bg-bg-800 flex flex-row items-stretch justify-between`}>
@@ -84,7 +90,6 @@ export function Workbench(p: {
                                 const Component = $.component;
                                 return <Component />;
                             })}
-                            {/* <div class={`flex flex-row items-center px-2 hover:bg-bg-700`}>NATS: {NATS_Status[nats_status.value]}</div> */}
                         </div>
                     </div>
                 </div>
@@ -108,14 +113,7 @@ registerSidebarTab({
 function HomeSidebar() {
     return (
         <div class={`size-full grid grid-cols-2 gap-2`}>
-            {[...$pub_crate$_main_views.values()].map((view) => (
-                <div class={`flex flex-col items-center justify-center text-xl max-h-28`} draggable>
-                    <div class={`text-3xl`}>
-                        <Ms>{view.icon}</Ms>
-                    </div>
-                    <span>{view.name}</span>
-                </div>
-            ))}
+            Home
         </div>
     );
 }

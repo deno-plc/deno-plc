@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import {
     $pub_crate$_main_views,
     type MainViewComponentProps,
     type MainViewContextComponent,
+    type MainViewContextComponentProps,
     registerBottomBarItem,
     registerMainView,
     useRegistrationUpdate,
@@ -34,6 +35,7 @@ import { Vec2 } from "@deno-plc/utils/vec2";
 import { Rect } from "@deno-plc/utils/rect";
 import { Ms } from "@deno-plc/ui/icons-ms";
 import { contextMenuPosition } from "@deno-plc/utils/geometry";
+import { LogPage } from "../../ui/src/console/Terminal.tsx";
 
 const MIN_CELL_SIZE = 100;
 
@@ -70,19 +72,18 @@ enum WBPointerMode {
 
 class WBLayoutState {
     constructor() {
-        effect(() => {
-            // console.log(`${WBPointerMode[this.pointer_mode]}: (${this.pointer.value.x},${this.pointer.value.y})`);
-            if (this.pointer_mode === WBPointerMode.None) {
-                if (!this.pointer.value.eq(this.pointer_down_point) && !this.pointer_down_point.eq(new Vec2(-1, -1))) {
-                    const r = Rect.from_start_end(this.pointer_down_point, this.pointer.value).fill_end();
+        effect(() => { // reruns on pointer move (between cells)
+            this.pointer.value; // some branches are controlled by non-signal values
+            if (this.pointer_mode.value === WBPointerMode.New) {
+                if (!this.pointer.value.eq(this.pointer_down_point.value) && !this.pointer_down_point.value.eq(new Vec2(-1, -1))) {
+                    const r = Rect.from_start_end(this.pointer_down_point.value, this.pointer.value).fill_end();
                     if (this.is_unoccupied(r)) {
                         this.preview.value = r;
                         this.show_preview.value = true;
                     }
                 }
-            } else if (this.pointer_mode === WBPointerMode.Move) {
+            } else if (this.pointer_mode.value === WBPointerMode.Move) {
                 const win = this.target_window;
-                // console.log("Move", win);
                 if (win) {
                     const pos = this.pointer.value;
                     const r = new Rect(pos.x, pos.y, win.w, win.h);
@@ -98,9 +99,8 @@ class WBLayoutState {
                     }
                     this.ignore_next_context_menu = true;
                 }
-            } else if (this.pointer_mode === WBPointerMode.Resize) {
+            } else if (this.pointer_mode.value === WBPointerMode.Resize) {
                 const win = this.target_window;
-                // console.log("Resize", win);
                 if (win) {
                     const pos = this.pointer.value;
                     const r = Rect.from_base_size(new Vec2(win.x, win.y), pos.sub(new Vec2(win.x, win.y))).fill_end();
@@ -124,27 +124,37 @@ class WBLayoutState {
             component: () => {
                 return (
                     <div class={`flex flex-row items-center px-2 hover:bg-bg-700`}>
-                        {WBPointerMode[this.pointer_mode]} ({this.pointer.value.x},{this.pointer.value.y})
+                        {WBPointerMode[this.pointer_mode.value]} ({this.pointer.value.x},{this.pointer.value.y})
                     </div>
                 );
             },
         });
     }
+
+    // always up to date size of the viewport
     root_rect: DOMRectReadOnly | null = null;
+
     geo = GridGeometryInfo.null();
+
     occupied_cells = new Uint8Array(0);
     model: LayoutModel | null = null;
     model_update: VoidFunction = () => {};
 
+    // current pointer position
     pointer = signal(new Vec2(0, 0));
-    pointer_mode = WBPointerMode.None;
-    pointer_down_point = new Vec2(-1, -1);
+    pointer_mode = signal(WBPointerMode.None);
+    // position where the last pointerdown event happened
+    pointer_down_point = signal(new Vec2(-1, -1));
 
+    // target window for moves and resizes
     target_window: LayoutModelWindow | null = null;
 
     preview = signal(Rect.null());
+
+    // shows the preview placeholder when creating windows and increases the bg-grid opacity
     show_preview = signal(false);
 
+    // shows the window creation menu, the window will be created in this space
     new_window_space = signal(Rect.null());
 
     ignored_pointer_events = new WeakSet<PointerEvent>();
@@ -154,6 +164,7 @@ class WBLayoutState {
     context_component = signal<MainViewContextComponent | null>(null);
     context_window: LayoutModelWindow | null = null;
 
+    // does not update this.occupied_cells
     public computeOccupiedCells(ignore: LayoutModelWindow[] = []) {
         if (!this.model) return new Uint8Array(0);
         const occupied_cells = new Uint8Array(this.geo.cols * this.geo.rows);
@@ -170,6 +181,7 @@ class WBLayoutState {
         return occupied_cells;
     }
 
+    // clears the occupied cells cache (called when the geometry changes)
     public clearOccupiedCells() {
         this.occupied_cells = new Uint8Array(0);
     }
@@ -214,7 +226,6 @@ class WBLayoutState {
 
     public is_unoccupied(r: Rect, occupied: Uint8Array = this.getOccupied()): boolean {
         const cols = this.geo.cols;
-        // const occupied = this.getOccupied();
         for (let i = r.x; i < r.x + r.w; i++) {
             for (let j = r.y; j < r.y + r.h; j++) {
                 if (i < 0 || j < 0 || i >= cols || j * cols + i >= occupied.length || occupied[j * cols + i]) {
@@ -224,6 +235,7 @@ class WBLayoutState {
         }
         return true;
     }
+
     public pointerEvent2GridPos(e: MouseEvent): Vec2 {
         if (!this.root_rect) return new Vec2(0, 0);
         const area_x = e.clientX - this.root_rect.left;
@@ -232,7 +244,9 @@ class WBLayoutState {
     }
 }
 
-export function WBLayout() {
+export function WBLayout(p: {
+    onGridUpdate: (geo: GridGeometryInfo) => void;
+}) {
     const root = useRef<HTMLDivElement>(null);
     const width = useSignal(0);
     const height = useSignal(0);
@@ -253,14 +267,12 @@ export function WBLayout() {
 
             const pointerup = (ev: PointerEvent) => {
                 if (!state.ignored_pointer_events.has(ev)) {
-                    state.pointer_down_point = new Vec2(-1, -1);
+                    state.pointer_down_point.value = new Vec2(-1, -1);
                     state.show_preview.value = false;
-                    state.pointer_mode = WBPointerMode.None;
+                    state.pointer_mode.value = WBPointerMode.None;
                     state.target_window = null;
-                    // setTimeout(() => {
                     state.context_component.value = null;
                     state.context_location.value = Rect.null();
-                    // }, 100);
                 }
             };
             addEventListener("pointerup", pointerup);
@@ -273,10 +285,12 @@ export function WBLayout() {
         }
     }, []);
 
-    const grid: GridGeometryInfo = useMemo(() => {
+    useMemo(() => {
+        // update grid geometry on size change
         const geo = GridGeometryInfo.compute(width.value, height.value);
         state.geo = geo;
         state.clearOccupiedCells();
+        p.onGridUpdate(geo);
         return geo;
     }, [width.value, height.value]);
 
@@ -302,15 +316,14 @@ export function WBLayout() {
                 }}
                 onPointerDown={(ev) => {
                     const pos = state.pointerEvent2GridPos(ev);
-                    state.pointer_down_point = pos;
-                    state.ignore_next_context_menu = false;
+                    state.pointer_down_point.value = pos;
                 }}
                 onPointerUp={(ev) => {
-                    state.pointer_mode = WBPointerMode.None;
+                    state.pointer_mode.value = WBPointerMode.None;
                     state.target_window = null;
                     const pos = state.pointerEvent2GridPos(ev);
-                    if (!pos.eq(state.pointer_down_point) && !state.pointer_down_point.eq(new Vec2(-1, -1))) {
-                        const r = Rect.from_start_end(state.pointer_down_point, pos).fill_end();
+                    if (!pos.eq(state.pointer_down_point.value) && !state.pointer_down_point.value.eq(new Vec2(-1, -1))) {
+                        const r = Rect.from_start_end(state.pointer_down_point.value, pos).fill_end();
                         if (state.is_unoccupied(r)) {
                             state.preview.value = r;
                             state.show_preview.value = true;
@@ -328,8 +341,16 @@ export function WBLayout() {
                     }
                 }}
             >
-                <GridGeometryContext.Provider value={grid}>
-                    <BgCanvas opacity={state.show_preview.value ? 1 : 0.2} />
+                <GridGeometryContext.Provider value={state.geo}>
+                    <BgCanvas
+                        opacity={state.show_preview.value ? 1 : 0.2}
+                        onPointerDown={() => {
+                            state.pointer_mode.value = WBPointerMode.New;
+                            state.new_window_space.value = Rect.null();
+                            state.preview.value = Rect.from_base_size(state.pointer.value, Vec2.null());
+                            state.show_preview.value = false;
+                        }}
+                    />
 
                     <WBPos {...state.preview.value} padding={10} class={`transition-all`}>
                         <div class={`size-full ${state.show_preview.value ? `bg-brand` : "bg-transparent"} transition-colors rounded-lg`}></div>
@@ -339,11 +360,11 @@ export function WBLayout() {
                         const { x, y, w, h, type } = win;
                         const pos = new Vec2(x, y);
                         const size = new Vec2(w, h);
-                        const size_limited = pos.add(size).min(new Vec2(grid.cols, grid.rows)).sub(pos);
+                        const size_limited = pos.add(size).min(new Vec2(state.geo.cols, state.geo.rows)).sub(pos);
                         const view = $pub_crate$_main_views.get(type);
                         if (!view) {
                             return (
-                                <WBPos x={x} y={y} h={h} w={w} padding={1} class={`transition-all`}>
+                                <WBPos x={x} y={y} h={h} w={w} padding={1} class={`transition-none`}>
                                     <div class={`size-full bg-red-500 rounded-lg text-black flex items-center justify-center`}>Unknown View</div>
                                 </WBPos>
                             );
@@ -356,8 +377,8 @@ export function WBLayout() {
                                 y={y}
                                 w={size_limited.x}
                                 h={size_limited.y}
-                                padding={-1}
-                                class={`transition-all`}
+                                padding={-2}
+                                class={`transition-none`}
                             >
                                 <Component
                                     x={x}
@@ -366,11 +387,11 @@ export function WBLayout() {
                                     w={w}
                                     id={id}
                                     onMovePointerDown={() => {
-                                        state.pointer_mode = WBPointerMode.Move;
+                                        state.pointer_mode.value = WBPointerMode.Move;
                                         state.target_window = win;
                                     }}
                                     onResizePointerDown={() => {
-                                        state.pointer_mode = WBPointerMode.Resize;
+                                        state.pointer_mode.value = WBPointerMode.Resize;
                                         state.target_window = win;
                                     }}
                                     onContextMenu={() => {
@@ -379,7 +400,11 @@ export function WBLayout() {
                                             return;
                                         }
                                         const win_loc = new Rect(x, y, w, h);
-                                        state.context_location.value = contextMenuPosition(new Vec2(grid.cols, grid.rows), win_loc, new Vec2(4, 3));
+                                        state.context_location.value = contextMenuPosition(
+                                            new Vec2(state.geo.cols, state.geo.rows),
+                                            win_loc,
+                                            new Vec2(4, 3),
+                                        );
                                         state.context_component.value = view.contextMenu;
                                         state.context_window = win;
                                     }}
@@ -392,10 +417,15 @@ export function WBLayout() {
                         <div class={`size-full`} onPointerUp={(ev) => state.ignored_pointer_events.add(ev)}>
                             <ContextComponent
                                 close_window={() => {
-                                    console.log("Close Window");
+                                    // console.log("Close Window");
                                     state.model!.windows = state.model!.windows.filter(([, win]) => win !== state.context_window);
-                                    console.log(state.model!.windows);
+                                    // console.log(state.model!.windows);
                                     state.model_update();
+                                    state.clearOccupiedCells();
+                                    state.context_component.value = null;
+                                    state.context_location.value = Rect.null();
+                                }}
+                                close_context_menu={() => {
                                     state.context_component.value = null;
                                     state.context_location.value = Rect.null();
                                 }}
@@ -473,6 +503,7 @@ function WBPos(p: {
 function TestComponent(
     p: MainViewComponentProps & {
         color: string;
+        name: string;
     },
 ) {
     return (
@@ -483,8 +514,8 @@ function TestComponent(
                 gridTemplateRows: `repeat(${p.h}, 1fr)`,
             }}
         >
-            <div class={`${p.color}`} onPointerDown={p.onMovePointerDown} onClick={p.onContextMenu}>
-                <div class={`text-black p-2 font-semibold text-xl`}>Subs</div>
+            <div class={`${p.color} relative overflow-hidden`} onPointerDown={p.onMovePointerDown} onClick={p.onContextMenu}>
+                <div class={`text-black p-2 font-semibold text-xl`}>{p.name}</div>
             </div>
             {Array.from({ length: p.w * p.h - 1 }).map((_, i) => (
                 <div class={`relative overflow-hidden border border-black`}>
@@ -503,14 +534,14 @@ function TestComponent(
     );
 }
 
-function TestContextMenu(p: { close_window: () => void }) {
-    console.log(p);
+function TestContextMenu(p: MainViewContextComponentProps) {
     return (
         <div class={`size-full pointer-events-auto p-3 absolute`}>
             <div class={`bg-bg-700 size-full bg-opacity-80 rounded-lg flex flex-col border border-accent overflow-hidden`}>
                 <div class={`basis-11 bg-bg-800 flex flex-row items-stretch`}>
                     <div class={`grow`}></div>
                     <div class={`basis-20 bg-red-700 flex flex-row items-center justify-center`} onClick={p.close_window}>Close</div>
+                    <div class={`basis-10 flex flex-row items-center justify-center`} onClick={p.close_context_menu}>X</div>
                 </div>
             </div>
         </div>
@@ -519,32 +550,58 @@ function TestContextMenu(p: { close_window: () => void }) {
 
 registerMainView({
     id: "test",
-    name: "Test",
+    name: "Subs",
     icon: "category",
-    component: (p) => <TestComponent {...p} color="bg-amber-500" />,
+    component: (p) => <TestComponent {...p} color="bg-amber-500" name="Subs" />,
     contextMenu: TestContextMenu,
 });
 
 registerMainView({
     id: "test2",
-    name: "Test2",
+    name: "Presets",
     icon: "category",
-    component: (p) => <TestComponent {...p} color="bg-green-600" />,
+    component: (p) => <TestComponent {...p} color="bg-green-600" name="Presets" />,
     contextMenu: TestContextMenu,
 });
 
 registerMainView({
     id: "test3",
-    name: "Test3",
+    name: "Groups",
     icon: "category",
-    component: (p) => <TestComponent {...p} color="bg-violet-500" />,
+    component: (p) => <TestComponent {...p} color="bg-violet-500" name="Groups" />,
     contextMenu: TestContextMenu,
 });
 
 registerMainView({
     id: "test4",
-    name: "Test4",
+    name: "ColorPalettes",
     icon: "category",
-    component: (p) => <TestComponent {...p} color="bg-blue-500" />,
+    component: (p) => <TestComponent {...p} color="bg-blue-500" name="ColorPalettes" />,
+    contextMenu: TestContextMenu,
+});
+
+registerMainView({
+    id: "logs",
+    name: "Logs",
+    icon: "terminal",
+    component: (p) => {
+        return (
+            <div className={`rounded-lg overflow-hidden relative pointer-events-auto border-4 border-bg-700 bg-bg-700 size-full flex flex-col`}>
+                <div
+                    class={`basis-10 bg-bg-900 border-b border-accent flex flex-row items-center px-4`}
+                    onPointerDown={p.onMovePointerDown}
+                    onClick={p.onContextMenu}
+                >
+                    Terminal
+                </div>
+                <LogPage />
+                <div
+                    class={`absolute bg-neutral-500 bg-opacity-50 bottom-0 right-0 translate-x-1/2 translate-y-1/2 rotate-45 size-14`}
+                    onPointerDown={p.onResizePointerDown}
+                >
+                </div>
+            </div>
+        );
+    },
     contextMenu: TestContextMenu,
 });

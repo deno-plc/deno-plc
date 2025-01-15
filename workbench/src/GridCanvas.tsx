@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import { GridGeometryContext, GridGeometryInfo } from "./WBLayout.tsx";
 
 export function BgCanvas(p: {
     opacity?: number;
+    onPointerDown?: (e: PointerEvent) => void;
 }) {
     const canvas = useRef<HTMLCanvasElement>(null);
     const ctx_ref = useRef<CanvasRenderingContext2D | null>(null);
@@ -72,6 +73,7 @@ export function BgCanvas(p: {
             style={{
                 opacity: p.opacity ?? 1,
             }}
+            onPointerDown={p.onPointerDown}
         />
     );
 }
