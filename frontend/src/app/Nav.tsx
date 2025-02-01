@@ -1,8 +1,8 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 import { ComponentChildren } from "preact";
 import { Ms } from "@deno-plc/ui/icons-ms";
 import { navigate, useLocation } from "@deno-plc/router";
+import { get_nightly } from "../../../utils/src/nightly.ts";
 
 function NavGroup(p: {
     title: string;
@@ -75,10 +76,10 @@ function NavLinkMs(p: {
 
 export function Nav() {
     return (
-        <div class={`basis-72 shrink-0 grow-0 border-r border-accent bg-bg-800 bg-opacity-60`}>
+        <div class={`basis-72 shrink-0 grow-0 border-r border-accent bg-black bg-opacity-60`}>
             <NavGroup title="App">
                 <NavLinkMs icon="house" href="/~home">Home</NavLinkMs>
-                <NavLinkMs icon="browse" href="/~workbench">Workbench</NavLinkMs>
+                {get_nightly("deno-plc.workbench.show_in_nav") ?? true ? <NavLinkMs icon="browse" href="/~workbench">Workbench</NavLinkMs> : null}
             </NavGroup>
 
             <NavGroup title="Dashboard">
@@ -105,6 +106,9 @@ export function Nav() {
 
             <NavGroup title="Debug">
                 <NavLinkMs icon="terminal" href="/~deno-plc/logs" hrefMatch={/^\/~deno-plc\/logs/}>Logs</NavLinkMs>
+                {get_nightly("deno-plc.nightly.show_in_nav") ?? true
+                    ? <NavLinkMs icon="experiment" href="/~deno-plc/nightly">Nightly</NavLinkMs>
+                    : null}
             </NavGroup>
         </div>
     );

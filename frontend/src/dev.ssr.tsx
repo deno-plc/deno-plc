@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC HMI
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,8 +50,10 @@ img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:midd
 ${importCSS("dev")}
 
 #app-main{
-   background-image: url("/src/img/bg.png");
+//    background-image: url("/src/img/bg.png");
+   background-color: black;
    background-size: 100% 100%;
+   color-scheme: dark;
 }
           `,
                         }}

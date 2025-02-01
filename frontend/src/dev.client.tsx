@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ import { render } from "preact";
 import { App } from "./app/App.tsx";
 import { init_nats } from "@deno-plc/nats";
 import { wsconnect } from "@nats-io/nats-core";
+import { setup_nightly } from "./app/nightly.ts";
 
 function Main() {
     return (
@@ -64,6 +65,7 @@ function Main() {
 async function init() {
     await log_config;
     document.body.innerHTML = "";
+    setup_nightly();
     render(<Main />, document.body);
 
     init_nats(wsconnect.bind(self, { servers: ["ws://localhost:1001"] }));

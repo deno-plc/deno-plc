@@ -1,8 +1,8 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ import { useEffect } from "preact/hooks";
 import { getLogger } from "@logtape/logtape";
 import { LogPage } from "@deno-plc/ui/console";
 import { TestPage } from "./components/TestPage.tsx";
+import { EditNightly } from "../../../ui/src/nightly/Nightly.tsx";
+import { nightly } from "./nightly.ts";
 
 const logger = getLogger(["app", "router"]);
 
@@ -71,6 +73,10 @@ function DenoPLCRouter({ location }: {
 }) {
     if (location === "/logs") {
         return <LogPage />;
+    }
+
+    if (location === "/nightly") {
+        return <EditNightly provider={nightly()} />;
     }
 
     return <E404></E404>;

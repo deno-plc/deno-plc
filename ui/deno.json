@@ -9,6 +9,7 @@
         "./nats": "./src/nats/nats.tsx",
         "./hooks": "./src/hooks/hooks.ts",
         "./console": "./src/console/console.ts",
-        "./console/client-terminal": "./src/console/client_terminal.ts"
+        "./console/client-terminal": "./src/console/client_terminal.ts",
+        "./nightly": "./src/nightly/Nightly.tsx"
     }
 }

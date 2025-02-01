@@ -7,6 +7,7 @@
         "./lock": "./src/lock.ts",
         "./once_lock": "./src/once_lock.ts",
         "./promise_timeout": "./src/promise_timeout.ts",
+        "./nightly": "./src/nightly.ts",
         "./rect": "./src/rect.ts",
         "./uuid": "./src/uuid.ts",
         "./vec2": "./src/vec2.ts",

@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,8 +54,6 @@ export function MemoryCtxProvider(p: { children: ComponentChildren }) {
     useEffect(() => {
         if (!id) {
             redirect(`~workbench/${crypto.randomUUID()}`);
-        } else {
-            console.log("id", id);
         }
     }, [id]);
     const model = useMemo(() => {

@@ -1,8 +1,8 @@
 /**
  * @license GPL-3.0-or-later
- * Deno-PLC HMI
+ * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,15 @@
 // import Logo from "../img/Logo.tsx";
 import { Ms } from "@deno-plc/ui/icons-ms";
 import { isFullscreen, toggleFullscreen } from "@deno-plc/ui/fullscreen";
+import { nightly } from "./nightly.ts";
+import { NightlyBadge } from "@deno-plc/ui/nightly";
 
 export function Header(p: {
     title: string;
 }) {
     return (
         <div
-            class={`flex flex-row items-center border-b border-accent py-2 px-3 gap-3 text-2xl text-stone-300 bg-bg-800 bg-opacity-60`}
+            class={`flex flex-row items-center border-b border-accent py-2 px-3 gap-3 text-2xl text-stone-300 bg-black bg-opacity-60`}
         >
             <div
                 class={`border border-accent rounded-md size-8 flex flex-row items-center justify-center`}
@@ -36,11 +38,14 @@ export function Header(p: {
             {/* <Logo width={90} height={60} /> */}
             <div>{p.title}</div>
             <div class={`grow h-full flex flex-row items-center justify-end gap-3`}>
-                <div
+                <NightlyBadge provider={nightly()} />
+                {
+                    /* <div
                     class={`flex flex-row items-center justify-center rounded-full bg-amber-500 text-stone-800 size-14 text-[2.5rem]`}
                 >
                     <Ms class="pb-1">warning</Ms>
-                </div>
+                </div> */
+                }
                 <div
                     class={`flex flex-row items-center justify-center rounded-full bg-bg-600 border border-accent size-14 text-3xl`}
                     onClick={toggleFullscreen}
