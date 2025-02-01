@@ -59,18 +59,19 @@ app.get("/dev-assets/material-symbols/:fam", async (c) => {
 });
 
 app.all("/", async (c) => {
+    const websocketProtocol = c.req.header("sec-websocket-protocol");
     if (
         c.req.header("Upgrade")?.toLowerCase() === "websocket" &&
-        c.req.header("sec-websocket-protocol") === "vite-hmr"
+        websocketProtocol?.startsWith("vite-")
     ) {
         const { response, socket: downstream } = Deno.upgradeWebSocket(
             c.req.raw,
             {
-                protocol: "vite-hmr",
+                protocol: websocketProtocol,
             },
         );
 
-        const upstream = new WebSocket("ws://[::1]:81/", "vite-hmr");
+        const upstream = new WebSocket("ws://[::1]:81/", websocketProtocol);
 
         const upstreamReady = Lock(true);
         const downstreamReady = Lock(true);
