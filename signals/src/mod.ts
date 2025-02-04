@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import * as preact_signals_current from "npm:@preact/signals@^1.3.0";
+import * as preact_signals_current from "npm:@preact/signals@^2.0.1";
 
 const preact_signals_brand = Symbol.for("@deno-plc/signals/brand:preact_signals");
 
@@ -38,4 +38,4 @@ export const useComputed = impl.useComputed;
 export const useSignal = impl.useSignal;
 export const useSignalEffect = impl.useSignalEffect;
 
-export type { ReadonlySignal, Signal } from "npm:@preact/signals@^1.3.0";
+export type { ReadonlySignal, Signal } from "npm:@preact/signals@^2.0.1";

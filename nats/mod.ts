@@ -152,5 +152,5 @@ export class NatsClient {
     }
 }
 
-export { BlobSink } from "./src/blob.sink.ts";
-export type { BlobSinkOptions } from "./src/blob.sink.ts";
+export type { BlobSink, BlobSinkOptions } from "./src/blob.sink.ts";
+export type { BlobSource, BlobSourceOptions } from "./src/blob.source.ts";
