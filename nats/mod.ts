@@ -32,7 +32,8 @@ import { assert } from "@std/assert/assert";
 import { wait } from "@deno-plc/utils/wait";
 import { logger } from "./src/shared.ts";
 import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor } from "./src/pub_crate.ts";
-import { BlobSource, BlobSubscriptionInner, type SubscribeBlobOptions } from "./src/blob.sink.ts";
+import { BlobSink, BlobSinkInner, type BlobSinkOptions } from "./src/blob.sink.ts";
+import { BlobSource, type BlobSourceOptions } from "./src/blob.source.ts";
 
 export { NATS_Status, nats_status } from "./state_container.ts";
 
@@ -133,19 +134,23 @@ export class NatsClient {
         return this.core.requestMany(subject, payload, opts);
     }
 
-    [$pub_crate$_blob_subscriptions]: Map<string, BlobSubscriptionInner> = new Map();
+    [$pub_crate$_blob_subscriptions]: Map<string, BlobSinkInner> = new Map();
 
-    blob_sink(subject: string, opt: SubscribeBlobOptions): BlobSource {
-        let inner: BlobSubscriptionInner;
+    blob_sink(subject: string, opt?: BlobSinkOptions): BlobSink {
+        let inner: BlobSinkInner;
         if (this[$pub_crate$_blob_subscriptions].has(subject)) {
             inner = this[$pub_crate$_blob_subscriptions].get(subject)!;
         } else {
-            inner = new BlobSubscriptionInner(this, subject, opt);
+            inner = new BlobSinkInner(this, subject, opt ?? {});
             this[$pub_crate$_blob_subscriptions].set(subject, inner);
         }
-        return BlobSource[$pub_crate$_constructor](inner);
+        return BlobSink[$pub_crate$_constructor](inner);
+    }
+
+    blob_source(subject: string, initial: Uint8Array, opt?: BlobSourceOptions): BlobSource {
+        return BlobSource[$pub_crate$_constructor](this, subject, initial, opt);
     }
 }
 
-export { BlobSource } from "./src/blob.sink.ts";
-export type { SubscribeBlobOptions } from "./src/blob.sink.ts";
+export { BlobSink } from "./src/blob.sink.ts";
+export type { BlobSinkOptions } from "./src/blob.sink.ts";
