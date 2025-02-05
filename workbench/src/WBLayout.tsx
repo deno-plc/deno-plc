@@ -35,7 +35,7 @@ import { Vec2 } from "@deno-plc/utils/vec2";
 import { Rect } from "@deno-plc/utils/rect";
 import { Ms } from "@deno-plc/ui/icons-ms";
 import { contextMenuPosition } from "@deno-plc/utils/geometry";
-import { LogPage } from "../../ui/src/console/Terminal.tsx";
+import { LogPage } from "@deno-plc/ui/console";
 
 const MIN_CELL_SIZE = 100;
 
