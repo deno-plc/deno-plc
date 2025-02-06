@@ -35,7 +35,7 @@ export function E404() {
     }, [location]);
     return (
         <div
-            class={`w-full h-full flex items-center justify-center flex-col text-red-700 bg-bg-800 bg-opacity-50`}
+            class={`w-full h-full flex items-center justify-center flex-col text-red-700 bg-bg-800/50`}
         >
             <div class={`text-[6rem] font-light`}>404</div>
             <div class={`text-xl font-semibold`}>Page Exists</div>
@@ -45,7 +45,7 @@ export function E404() {
 
 function DefaultHome() {
     return (
-        <div class={`w-full h-full flex items-center flex-col bg-bg-800 bg-opacity-50`}>
+        <div class={`w-full h-full flex items-center flex-col bg-bg-800/50`}>
             <div class={`flex flex-row items-center gap-6`}>
                 <div>
                     {/* <Logo /> */}
@@ -57,7 +57,7 @@ function DefaultHome() {
                     return (
                         <div
                             key={i}
-                            class={`flex flex-col items-center pt-2 text-xl min-h-32 min-w-28 border border-accent bg-bg-800 bg-opacity-50 rounded-lg`}
+                            class={`flex flex-col items-center pt-2 text-xl min-h-32 min-w-28 border border-accent bg-bg-800/50 rounded-lg`}
                         >
                             {$}
                         </div>

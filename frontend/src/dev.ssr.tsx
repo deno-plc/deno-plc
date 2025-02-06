@@ -20,12 +20,16 @@
 import { StatusCode } from "hono/utils/http-status";
 import { SSRContext } from "@deno-plc/router";
 import { importCSS } from "./material-icons.ssr.ts";
-import { encodeBase58 } from "@std/encoding/base58";
 
-export function DevSSR(path: string, onError: (code: StatusCode) => void) {
+export async function DevSSR(path: string, onError: (code: StatusCode) => void) {
+    const [style, tailwind] = await Promise.all([
+        Deno.readTextFile(new URL("./style/style.css", import.meta.url)),
+        Deno.readTextFile(new URL("./style/tailwind.css", import.meta.url)),
+    ]);
+
     return (
         <SSRContext path={path} error={onError}>
-            <html>
+            <html class={`color-brand`}>
                 <head>
                     <title>Deno-PLC HMI (Development Mode)</title>
                     <meta
@@ -33,43 +37,20 @@ export function DevSSR(path: string, onError: (code: StatusCode) => void) {
                         content="width=device-width, initial-scale=1"
                     >
                     </meta>
+                    <style dangerouslySetInnerHTML={{ __html: style }} />
+                    <style dangerouslySetInnerHTML={{ __html: importCSS("dev") }} />
+                    <style type="text/tailwindcss" dangerouslySetInnerHTML={{ __html: tailwind }} />
+                    <script type="module" src="/dev-assets/tailwind-play" async />
+
                     <script type="module" src="/@vite/client" async />
                     <script type="module" src="/frontend/src/dev.client.tsx" async />
-                    <script type="module" src="/dev-assets/tailwind" async />
-                    <script type="module" src="/@id/@xterm/xterm/css/xterm.css" async />
-                    {/* <link rel="stylesheet" href={`@xterm/xterm/css/xterm.css`} /> */}
-                    <style
-                        dangerouslySetInnerHTML={{
-                            /* Subset of tailwind preflight + black bg + white scrollbar */
-                            __html: `
-*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;scrollbar-width:thin;scrollbar-color:#ddd transparent}
-:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:"Source Sans 3",ui-sans-serif,system-ui,sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}
-body{margin:0;line-height:inherit;background-color:black;color:white;overflow:auto;height:100vh}
-.hidden,[hidden]{display:none}
-img,svg,video,canvas,audio,iframe,embed,object{display:block;vertical-align:middle;}
-${importCSS("dev")}
 
-#app-main{
-//    background-image: url("/src/img/bg.png");
-   background-color: black;
-   background-size: 100% 100%;
-   color-scheme: dark;
-}
-          `,
-                        }}
-                    />
+                    <script type="module" src="/@id/@xterm/xterm/css/xterm.css" async />
                 </head>
                 <body>
-                    <span class={`bg-black text-brand flex flex-row items-center justify-center w-full h-full`}>loading...</span>
-                    {/* <DevRouter /> */}
+                    <span class={`bg-[#111] text-brand flex flex-row items-center justify-center w-full h-full`}>loading...</span>
                 </body>
             </html>
         </SSRContext>
     );
-}
-
-export async function tailwind_config_code(): Promise<string> {
-    const hash = await crypto.subtle.digest("SHA-256", await Deno.readFile("./tailwind.config.ts"));
-    const tailwind_config = await import("../../tailwind.config.ts?t=" + encodeBase58(new Uint8Array(hash)));
-    return `tailwind.config = ${JSON.stringify(tailwind_config.default)};`;
 }

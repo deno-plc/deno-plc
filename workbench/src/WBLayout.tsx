@@ -437,7 +437,7 @@ export function WBLayout(p: {
             <div
                 class={`absolute size-full ${
                     !state.new_window_space.value.eq(Rect.null()) ? `opacity-100` : `pointer-events-none opacity-0`
-                } transition-opacity bg-stone-800 bg-opacity-35 p-20`}
+                } transition-opacity bg-stone-800/35 p-20`}
                 onClick={() => {
                     state.show_preview.value = false;
                     state.new_window_space.value = Rect.null();
@@ -526,7 +526,7 @@ function TestComponent(
                 </div>
             ))}
             <div
-                class={`absolute bg-neutral-500 bg-opacity-50 bottom-0 right-0 translate-x-1/2 translate-y-1/2 rotate-45 size-14`}
+                class={`absolute bg-neutral-500/50 bottom-0 right-0 translate-x-1/2 translate-y-1/2 rotate-45 size-14`}
                 onPointerDown={p.onResizePointerDown}
             >
             </div>
@@ -537,7 +537,7 @@ function TestComponent(
 function TestContextMenu(p: MainViewContextComponentProps) {
     return (
         <div class={`size-full pointer-events-auto p-3 absolute`}>
-            <div class={`bg-bg-700 size-full bg-opacity-80 rounded-lg flex flex-col border border-accent overflow-hidden`}>
+            <div class={`bg-bg-700/80 size-full rounded-lg flex flex-col border border-accent overflow-hidden`}>
                 <div class={`basis-11 bg-bg-800 flex flex-row items-stretch`}>
                     <div class={`grow`}></div>
                     <div class={`basis-20 bg-red-700 flex flex-row items-center justify-center`} onClick={p.close_window}>Close</div>
@@ -596,7 +596,7 @@ registerMainView({
                 </div>
                 <LogPage />
                 <div
-                    class={`absolute bg-neutral-500 bg-opacity-50 bottom-0 right-0 translate-x-1/2 translate-y-1/2 rotate-45 size-14`}
+                    class={`absolute bg-neutral-500/50 bottom-0 right-0 translate-x-1/2 translate-y-1/2 rotate-45 size-14`}
                     onPointerDown={p.onResizePointerDown}
                 >
                 </div>

@@ -18,7 +18,6 @@
  */
 
 import { get_nightly, type LocalStorageNightly } from "@deno-plc/utils/nightly";
-import { useState } from "preact/hooks";
 import { Ms } from "../icons/Ms.tsx";
 import { type Signal, useSignal } from "@deno-plc/signals";
 import { NumberInput, Switch, TextInput } from "../forms/Forms.tsx";
@@ -47,9 +46,9 @@ export function EditNightly(p: {
     provider: LocalStorageNightly;
 }): VNode {
     p.provider.update_view.value;
-    const [edit, setEdit] = useState<string | null>(null);
+    const edit = useSignal<string | null>(null);
     return (
-        <div class={`size-full overflow-auto bg-bg-800 bg-opacity-50 relative`}>
+        <div class={`size-full overflow-auto bg-bg-800/50 relative`}>
             <div class={`grid grid-cols-2`}>
                 <div class={`sticky border-r border-b border-accent px-3 py-1`}>ID</div>
                 <div class={`sticky border-b border-accent px-3 py-1`}>Value</div>
@@ -58,11 +57,11 @@ export function EditNightly(p: {
                         <>
                             <div
                                 class={`border-r border-b border-accent px-3 py-1`}
-                                onClick={() => setEdit(key)}
+                                onClick={() => edit.value = key}
                             >
                                 {key}
                             </div>
-                            <div class={`border-b border-accent px-3 py-1`} onClick={() => setEdit(key)}>
+                            <div class={`border-b border-accent px-3 py-1`} onClick={() => edit.value = key}>
                                 <div>{JSON.stringify(value)}</div>
                                 {p.provider.options.get(key) !== value && <div>Current: {JSON.stringify(p.provider.options.get(key))}</div>}
                             </div>
@@ -70,15 +69,7 @@ export function EditNightly(p: {
                     )),
                 ]}
             </div>
-            {
-                /* <div class={`absolute right-4 bottom-4 bg-green-600 text-white text-lg font-semibold flex flex-row px-2 py-1 items-center gap-1 rounded`} onClick={() => {
-
-        }}>
-            <Ms>add</Ms>
-            <div>Add Option</div>
-        </div> */
-            }
-            {edit && <ValueEdit id={edit} close={() => setEdit(null)} provider={p.provider} />}
+            {edit.value && <ValueEdit id={edit.value} close={() => edit.value = null} provider={p.provider} />}
         </div>
     );
 }
@@ -98,7 +89,7 @@ function ValueEdit(p: {
     };
     return (
         <div
-            class={`absolute top-0 left-0 size-full bg-bg-800 bg-opacity-25 flex flex-row items-center justify-center z-10`}
+            class={`absolute top-0 left-0 size-full bg-bg-800/25 flex flex-row items-center justify-center z-10`}
             onClick={() => p.close()}
             onKeyDown={(ev) => {
                 if (ev.key === "Enter") {

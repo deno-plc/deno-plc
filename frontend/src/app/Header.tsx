@@ -28,7 +28,7 @@ export function Header(p: {
 }) {
     return (
         <div
-            class={`flex flex-row items-center border-b border-accent py-2 px-3 gap-3 text-2xl text-stone-300 bg-black bg-opacity-60`}
+            class={`flex flex-row items-center border-b border-accent py-2 px-3 gap-3 text-2xl text-stone-300 bg-black/60`}
         >
             <div
                 class={`border border-accent rounded-md size-8 flex flex-row items-center justify-center`}

@@ -19,7 +19,7 @@
 
 export function TestPage() {
     return (
-        <div class={`w-full h-full flex items-center flex-col bg-bg-800 bg-opacity-50`}>
+        <div class={`w-full h-full flex items-center flex-col bg-bg-800/50`}>
             Foo
         </div>
     );

@@ -23,7 +23,7 @@ import { config } from "./vite.ts";
 import { Lock } from "https://deno.land/x/simple_promise_lock@v2.2.1/deno/lock.ts";
 import { render } from "preact-render-to-string";
 import { StatusCode } from "hono/utils/http-status";
-import { DevSSR, tailwind_config_code } from "./dev.ssr.tsx";
+import { DevSSR } from "./dev.ssr.tsx";
 import { serveFile } from "@std/http";
 import { getPath } from "./material-icons.ssr.ts";
 import { Hono } from "hono";
@@ -47,10 +47,10 @@ app.use((c, next) => {
     return next();
 });
 
-app.get("/dev-assets/tailwind", async (c) => {
+app.get("/dev-assets/tailwind-play", async (c) => {
     const play_code = await Deno.readTextFile("./frontend/src/style/play.tailwind.js.bin");
     c.header("Content-Type", "text/javascript");
-    return c.body(`${play_code};${await tailwind_config_code()}`);
+    return c.body(`${play_code}`);
 });
 
 app.get("/dev-assets/material-symbols/:fam", async (c) => {

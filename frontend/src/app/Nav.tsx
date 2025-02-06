@@ -45,8 +45,8 @@ function NavLink(p: {
     const active = p.hrefMatch ? p.hrefMatch.test(loc) : loc === p.href;
     return (
         <a
-            class={`flex flex-row rounded-md items-center py-1 px-3 gap-2 leading-none select-none bg-opacity-60 hover:bg-opacity-40 ${
-                active ? `bg-bg-900 text-brand` : `hover:bg-bg-900`
+            class={`flex flex-row rounded-md items-center py-1 px-3 gap-2 leading-none select-none ${
+                active ? `bg-bg-800/60 hover:bg-bg-800/40 text-brand` : `hover:bg-bg-800/40`
             }`}
             href={p.href}
             onClick={(ev) => {
@@ -76,7 +76,7 @@ function NavLinkMs(p: {
 
 export function Nav() {
     return (
-        <div class={`basis-72 shrink-0 grow-0 border-r border-accent bg-black bg-opacity-60`}>
+        <div class={`basis-72 shrink-0 grow-0 border-r border-accent bg-black/60`}>
             <NavGroup title="App">
                 <NavLinkMs icon="house" href="/~home">Home</NavLinkMs>
                 {get_nightly("deno-plc.workbench.show_in_nav") ?? true ? <NavLinkMs icon="browse" href="/~workbench">Workbench</NavLinkMs> : null}
