@@ -59,7 +59,7 @@ export function LogPage(): VNode {
             <div class={`basis-10 border-b border-accent flex flex-row items-stretch [&>*:not(:last-child)]:border-r overflow-x-auto`}>
                 {[...logTerminals.values()].map((ter) => (
                     <div
-                        class={`flex flex-row items-center justify-center flex-grow border-accent font-semibold text-lg overflow-ellipsis overflow-hidden whitespace-nowrap min-w-fit px-4 basis-0 cursor-pointer  ${
+                        class={`flex flex-row items-center justify-center grow border-accent font-semibold text-lg overflow-ellipsis overflow-hidden whitespace-nowrap min-w-fit px-4 basis-0 cursor-pointer  ${
                             ter === active.value ? `text-brand bg-bg-900` : `bg-bg-800`
                         }`}
                         onClick={() => {

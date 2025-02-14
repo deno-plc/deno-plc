@@ -1,4 +1,11 @@
 {
     "deno.enable": true,
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    "tailwindCSS.experimental.configFile": "frontend/src/style/tailwind.css",
+    "editor.quickSuggestions": {
+        "strings": "on"
+    }
 }

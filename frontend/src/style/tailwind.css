@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,11 +16,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+ 
+@theme {
+    --color-brand: rgb(51, 162, 56);
+    --color-accent: #4a4a4a;
+    --color-bg-900: #121210;
+    --color-bg-800: #191919;
+    --color-bg-700: #212121;
+    --color-bg-600: #2b2b2b;
+}
 
-export function TestPage() {
-    return (
-        <div class={`w-full h-full flex items-center flex-col bg-bg-800/50`}>
-            Foo
-        </div>
-    );
+@keyframes load {
+    0% {
+        left: 0%;
+        right: 100%;
+    }
+    30% {
+        left: 0%;
+    }
+    50% {
+        right: 0%;
+    }
+    100% {
+        left: 100%;
+        right: 0%;
+    }
+}
+
+@utility animate-load{
+    animation: load 2s linear infinite;
+}
+
+@utility transition-size{
+    transition-property: width, height;
 }
