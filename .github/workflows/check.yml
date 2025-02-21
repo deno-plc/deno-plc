@@ -1,0 +1,33 @@
+name: Check
+on:
+    push:
+        branches: main
+    pull_request:
+        branches: main
+
+jobs:
+    publish:
+        name: Publish
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: read
+            id-token: write
+
+        steps:
+            - name: Clone repository
+              uses: actions/checkout@v3
+
+            - name: Install Deno
+              uses: denoland/setup-deno@v1
+              with:
+                  deno-version: v2.x
+
+            - name: Install NATS
+              run: curl -sf https://binaries.nats.dev/nats-io/nats-server/v2@latest | sh
+
+            - name: Test
+              run: deno task check-ci
+
+            - name: Simulate Publish package to JSR
+              run: deno publish --dry-run
