@@ -75,6 +75,10 @@ export async function init_nats(connect: () => Promise<NatsConnection>): Promise
 
     logger.info`connected`;
 
+    for (const [key, value] of Object.entries(nc.info!)) {
+        logger.info`server ${key}: ${value}`;
+    }
+
     const client = new NatsClient(nc);
 
     nats_client.init(client);
