@@ -21,11 +21,13 @@ import { wsconnect } from "@nats-io/nats-core";
 import { NatsClient } from "../mod.ts";
 import { fromFileUrl } from "jsr:@std/path";
 
+const is_ci = Deno.args.includes("--ci");
+
 export async function get_test_nats_client(): Promise<{
     client: NatsClient;
     dispose: () => Promise<void>;
 }> {
-    const server = new Deno.Command("nats-server", {
+    const server = new Deno.Command(is_ci ? new URL("../../nats-server", import.meta.url) : "nats-server", {
         args: ["-c", fromFileUrl(new URL("test.nats.conf", import.meta.url))],
         stdout: "null",
         stderr: "null",

@@ -11,7 +11,7 @@
     ],
     "tasks": {
         "check": "deno run -A npm:cspell@^8.14.2 lint . --no-progress & (deno fmt && deno lint --fix && deno publish --dry-run --allow-dirty && deno test -A)",
-        "check-ci": "deno fmt --check & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno test -A",
+        "check-ci": "deno fmt --check & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno test -A --ci",
         "check:license": "deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts",
         "check:spell": "deno run -A npm:cspell@^8.14.2 lint .",
         "dev": "deno run -A frontend/src/dev.ts"
