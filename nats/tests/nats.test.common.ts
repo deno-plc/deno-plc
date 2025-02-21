@@ -21,7 +21,7 @@ import { wsconnect } from "@nats-io/nats-core";
 import { NatsClient } from "../mod.ts";
 import { fromFileUrl } from "jsr:@std/path";
 
-const is_ci = Deno.args.includes("--ci");
+const is_ci = Deno.env.get("GITHUB_ACTIONS") === "true";
 
 export async function get_test_nats_client(): Promise<{
     client: NatsClient;
