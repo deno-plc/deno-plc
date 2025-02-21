@@ -74,7 +74,7 @@ class UseTerminal {
     }
     public Render: FunctionComponent = () => {
         return (
-            <div class={"w-full h-full bg-black p-2 overflow-hidden"}>
+            <div class="w-full h-full bg-black p-2 overflow-hidden">
                 <div
                     class={`size-full`}
                     ref={(node) => {

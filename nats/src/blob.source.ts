@@ -59,7 +59,7 @@ export class BlobSource {
         return src;
     }
 
-    #last_value = new Uint8Array(0);
+    #last_value: Uint8Array = new Uint8Array(0);
 
     #full_update = new Uint8Array(1);
 

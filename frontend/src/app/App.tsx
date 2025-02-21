@@ -35,7 +35,7 @@ export function App(p: {
         return <Workbench notification_aggregator={<NotificationAggregator />} />;
     }
     return (
-        <div class={`size-full bg-no-repeat absolute`} id={"app-main"}>
+        <div class={`size-full bg-no-repeat absolute`} id="app-main">
             <div
                 class={`size-full flex flex-col items-stretch relative overflow-hidden backdrop-blur-[10vh] contrast-more:bg-black forced-colors:bg-black contrast-more:backdrop-blur-none`}
             >
@@ -44,7 +44,7 @@ export function App(p: {
                 <div class={`grow flex flex-row relative overflow-hidden`}>
                     <Nav />
                     <div class={`grow relative overflow-hidden`}>
-                        <PageRouter children={p.children} />
+                        <PageRouter>{p.children}</PageRouter>
                     </div>
 
                     <div

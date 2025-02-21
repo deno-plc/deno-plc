@@ -56,9 +56,9 @@ export function Link(p: JSXInternal.HTMLAttributes<HTMLAnchorElement>): VNode {
 
 export function Redirect(p: {
     href: string;
-}): VNode {
+}): null {
     useEffect(() => {
         redirect(p.href);
     }, [p.href]);
-    return <></>;
+    return null;
 }

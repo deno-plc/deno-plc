@@ -299,7 +299,7 @@ export function WBLayout(p: {
     state.model = layout;
     state.model_update = updateLayout;
 
-    const ContextComponent = state.context_component.value ?? (() => <></>);
+    const ContextComponent = state.context_component.value ?? (() => null);
 
     return (
         <div

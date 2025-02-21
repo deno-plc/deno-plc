@@ -35,8 +35,7 @@ export async function DevSSR(path: string, onError: (code: StatusCode) => void) 
                     <meta
                         name="viewport"
                         content="width=device-width, initial-scale=1"
-                    >
-                    </meta>
+                    />
                     <style dangerouslySetInnerHTML={{ __html: style }} />
                     <style dangerouslySetInnerHTML={{ __html: importCSS("dev") }} />
                     <style type="text/tailwindcss" dangerouslySetInnerHTML={{ __html: tailwind }} />

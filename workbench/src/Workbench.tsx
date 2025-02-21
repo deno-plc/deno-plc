@@ -88,7 +88,7 @@ export function Workbench(p: {
                         <div class={`flex flex-row items-stretch justify-end`}>
                             {[...$pub_crate$_bottom_bar_items.values()].map(($) => {
                                 const Component = $.component;
-                                return <Component />;
+                                return <Component key={$.id} />;
                             })}
                         </div>
                     </div>

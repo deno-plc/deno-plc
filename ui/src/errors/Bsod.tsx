@@ -168,7 +168,7 @@ export function Bsod(p: {
 export function BsodText(p: {
     children: string;
 }): VNode {
-    return <>{p.children.split("\n").map(($) => <div>{$}</div>)}</>;
+    return <>{p.children.split("\n").map(($, i) => <div key={i}>{$}</div>)}</>;
 }
 
 /**
@@ -177,7 +177,11 @@ export function BsodText(p: {
 export function BsodTerminal(p: {
     children: string;
 }): VNode {
-    return <code class={`break-all whitespace-break-spaces`}>{p.children.split("\n").map(($) => <BsodTerminalLine>{$}</BsodTerminalLine>)}</code>;
+    return (
+        <code class={`break-all whitespace-break-spaces`}>
+            {p.children.split("\n").map(($, i) => <BsodTerminalLine key={i}>{$}</BsodTerminalLine>)}
+        </code>
+    );
 }
 
 function BsodTerminalLine(p: {
@@ -230,7 +234,7 @@ ${p.error.stack ?? "No stacktrace available"}`}
             asJSON = JSON.stringify(p.error, undefined, 3);
         } catch (_err) {
             return (
-                <Bsod errorcode={"UNKNOWN_EXCEPTION"}>
+                <Bsod errorcode="UNKNOWN_EXCEPTION">
                     {p.children}
                 </Bsod>
             );
