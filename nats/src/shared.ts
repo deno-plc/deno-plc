@@ -24,3 +24,21 @@ export const logger = getLogger(["app", "nats"]);
 export const dispose_registry = new FinalizationRegistry<string>((subject) => {
     logger.warn`${subject} was not disposed correctly. This leads to memory leaks.`;
 });
+
+/**
+ * The fetch strategy for a source.
+ */
+export enum FetchStrategy {
+    /**
+     * Don't fetch at all. Only recommended for values that change on a regular basis.
+     */
+    Off,
+    /**
+     * Fetch the latest value using NATS Core Request/Response.
+     */
+    Unicast,
+    /**
+     * Fetch the latest value using NATS Core Publish/Subscribe. (Response is sent to all subscribers)
+     */
+    Multicast,
+}

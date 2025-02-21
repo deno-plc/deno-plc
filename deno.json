@@ -54,7 +54,7 @@
         "lib": [
             "deno.window",
             "deno.ns",
-            "ES2023",
+            "ES2024",
             "DOM",
             "DOM.Iterable",
             "DOM.AsyncIterable",

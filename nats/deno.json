@@ -1,5 +1,8 @@
 {
     "name": "@deno-plc/nats",
     "version": "0.0.2",
-    "exports": "./mod.ts"
+    "exports": "./mod.ts",
+    "imports": {
+        "@std/msgpack": "jsr:@std/msgpack@^1.0.3"
+    }
 }

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import type { Subscription } from "@nats-io/nats-core";
 import type { NatsClient } from "../mod.ts";
 import { $pub_crate$_constructor } from "./pub_crate.ts";
 import { dispose_registry } from "./shared.ts";
@@ -44,9 +45,11 @@ export class BlobSource {
         }
     }
 
+    #fetch_subscription: Subscription | undefined;
+
     async #run_fetch() {
-        const sub = this.client.subscribe(`%blob_source_v1%.${this.subject}`);
-        for await (const msg of sub) {
+        this.#fetch_subscription = this.client.subscribe(`%blob_source_v1%.${this.subject}`);
+        for await (const msg of this.#fetch_subscription) {
             msg.respond(this.#last_value);
         }
     }
@@ -89,6 +92,7 @@ export class BlobSource {
     }
 
     [Symbol.dispose]() {
+        this.#fetch_subscription?.unsubscribe();
         dispose_registry.unregister(this.#registration_id);
         clearTimeout(this.periodic_timeout_id);
     }

@@ -31,9 +31,11 @@ import { nats_client, NATS_Status, nats_status } from "./state_container.ts";
 import { assert } from "@std/assert/assert";
 import { wait } from "@deno-plc/utils/wait";
 import { logger } from "./src/shared.ts";
-import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor } from "./src/pub_crate.ts";
+import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor, $pub_crate$_map_subscriptions } from "./src/pub_crate.ts";
 import { BlobSink, BlobSinkInner, type BlobSinkOptions } from "./src/blob.sink.ts";
 import { BlobSource, type BlobSourceOptions } from "./src/blob.source.ts";
+import { MapSource, type MapSourceOptions } from "./src/map.source.ts";
+import { MapSink, MapSinkInner, type MapSinkOptions } from "./src/map.sink.ts";
 
 export { NATS_Status, nats_status } from "./state_container.ts";
 
@@ -154,7 +156,28 @@ export class NatsClient {
     blob_source(subject: string, initial: Uint8Array, opt?: BlobSourceOptions): BlobSource {
         return BlobSource[$pub_crate$_constructor](this, subject, initial, opt);
     }
+
+    [$pub_crate$_map_subscriptions]: Map<string, MapSinkInner> = new Map();
+
+    map_sink(subject: string, opt?: MapSinkOptions): MapSink {
+        let inner: MapSinkInner;
+        if (this[$pub_crate$_map_subscriptions].has(subject)) {
+            inner = this[$pub_crate$_map_subscriptions].get(subject)!;
+        } else {
+            inner = new MapSinkInner(this, subject, opt ?? {});
+            this[$pub_crate$_map_subscriptions].set(subject, inner);
+        }
+        return MapSink[$pub_crate$_constructor](inner);
+    }
+
+    map_source(subject: string, opt?: MapSourceOptions): MapSource {
+        return MapSource[$pub_crate$_constructor](this, subject, opt);
+    }
 }
 
 export type { BlobSink, BlobSinkOptions } from "./src/blob.sink.ts";
 export type { BlobSource, BlobSourceOptions } from "./src/blob.source.ts";
+export type { MapSource, MapSourceOptions } from "./src/map.source.ts";
+export type { MapSink, MapSinkOptions } from "./src/map.sink.ts";
+
+export { FetchStrategy } from "./src/shared.ts";
