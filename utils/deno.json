@@ -1,6 +1,6 @@
 {
     "name": "@deno-plc/utils",
-    "version": "0.0.3",
+    "version": "0.1.0",
     "exports": {
         "./ascii": "./src/ascii.ts",
         "./geometry": "./src/geo.ts",
