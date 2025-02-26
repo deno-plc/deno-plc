@@ -29,11 +29,11 @@ Deno.test("map transfer.fetch", async () => {
         enable_fetching: true,
     };
 
-    const src = client.map_source("test", opt);
+    using src = client.map_source("test", opt);
     src.set("foo", 5);
     src.set("bar", 8);
+    await using sink = client.map_sink("test", opt);
 
-    const sink = client.map_sink("test", opt);
     const sink_value_matches = computed(() => sink.value.get("foo") === 5 && sink.value.get("bar") === 8);
     await awaitSignal(sink_value_matches, true);
     await dispose();
@@ -46,8 +46,8 @@ Deno.test("map transfer.update", async () => {
         enable_fetching: false,
     };
 
-    const src = client.map_source("test", opt);
-    const sink = client.map_sink("test", opt);
+    using src = client.map_source("test", opt);
+    await using sink = client.map_sink("test", opt);
     src.set("foo", 5);
     src.set("bar", 8);
     const sink_value_matches = computed(() => sink.value.get("foo") === 5 && sink.value.get("bar") === 8);

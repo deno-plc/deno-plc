@@ -31,14 +31,14 @@ Deno.test("blob transfer.fetch", async () => {
 
     const value = new Uint8Array(15);
     crypto.getRandomValues(value);
-    const _src = client.blob_source("test", value, opt);
-    const sink = client.blob_sink("test", opt);
+    using _src = client.blob_source("test", value, opt);
+    await using sink = client.blob_sink("test", opt);
     const sink_value_matches = computed(() => {
         if (sink.value.length !== value.length) return false;
         for (let i = 0; i < value.length; i++) {
             if (sink.value[i] !== value[i]) return false;
         }
-        return true;
+        return sink.valid;
     });
     await awaitSignal(sink_value_matches, true);
     await dispose();
@@ -53,14 +53,14 @@ Deno.test("blob transfer.update", async () => {
 
     const value = new Uint8Array(15);
     crypto.getRandomValues(value);
-    const src = client.blob_source("test", new Uint8Array(0), opt);
-    const sink = client.blob_sink("test", opt);
+    using src = client.blob_source("test", new Uint8Array(0), opt);
+    await using sink = client.blob_sink("test", opt);
     const sink_value_matches = computed(() => {
         if (sink.value.length !== value.length) return false;
         for (let i = 0; i < value.length; i++) {
             if (sink.value[i] !== value[i]) return false;
         }
-        return true;
+        return sink.valid;
     });
     src.update(value);
     await awaitSignal(sink_value_matches, true);

@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,3 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-export function wait(time: number, abort?: AbortSignal): Promise<void> {
-    return new Promise<void>((resolve) => {
-        let resolved = false;
-        const id = setTimeout(() => {
-            if (!resolved) {
-                resolve();
-                resolved = true;
-            }
-        }, time);
-        if (abort) {
-            abort.addEventListener("abort", () => {
-                clearTimeout(id);
-                if (!resolved) {
-                    resolve();
-                    resolved = true;
-                }
-            });
-        }
-    });
-}

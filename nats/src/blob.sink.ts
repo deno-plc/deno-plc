@@ -26,6 +26,7 @@ import { awaitSignal } from "@deno-plc/signal-utils/async";
 import { assert } from "@std/assert/assert";
 import type { NatsClient } from "./client.ts";
 import { NATS_Status } from "./state_container.ts";
+import { wait } from "../../utils/src/wait.ts";
 
 /**
  * Options for subscribing to a blob
@@ -90,13 +91,13 @@ export class BlobSinkInner {
 
     #retry: RetryManager;
 
+    #subscription: Subscription;
     #disconnect_handler_release: VoidFunction;
     #timeout: number = -1;
 
-    #subscription: Subscription;
-
     instances = 0;
     destroyed = false;
+    destroy_abort: AbortController = new AbortController();
 
     #reset_timeout() {
         clearTimeout(this.#timeout);
@@ -114,8 +115,6 @@ export class BlobSinkInner {
             await awaitSignal(this.client.nats_status, NATS_Status.Connected);
             if (this.destroyed) break;
 
-            logger.debug`fetching blob ${this.subject}`;
-
             try {
                 const msg = await this.client.request(`%blob_source_v1%.${this.subject}`);
 
@@ -130,7 +129,7 @@ export class BlobSinkInner {
                 logger.error`error fetching blob ${this.subject}: ${err}`;
             }
 
-            await this.#retry.wait();
+            await this.#retry.wait(this.destroy_abort.signal);
         }
     }
 
@@ -174,6 +173,7 @@ export class BlobSinkInner {
             this.client[$pub_crate$_blob_subscriptions].delete(this.subject);
             this.#subscription.unsubscribe();
             clearTimeout(this.#timeout);
+            this.destroy_abort.abort();
             this.#disconnect_handler_release();
             this.valid.value = false;
 
@@ -217,7 +217,7 @@ export class BlobSink {
         return this[$pub_crate$_inner].valid.value;
     }
 
-    [Symbol.dispose]() {
+    async [Symbol.asyncDispose]() {
         if (this.#destroyed) {
             return;
         }
@@ -225,12 +225,15 @@ export class BlobSink {
         this[$pub_crate$_inner].instances--;
         dispose_registry.unregister(this.#registration_id);
         // in hooks the old values are dropped first, so we need to wait a bit in case the subscription is used again
-        setTimeout(() => {
-            this[$pub_crate$_inner].try_dispose();
-        }, 100);
+        await wait(100);
+        this[$pub_crate$_inner].try_dispose();
     }
 
-    dispose() {
-        this[Symbol.dispose]();
+    [Symbol.dispose]() {
+        this[Symbol.asyncDispose]();
+    }
+
+    async dispose() {
+        await this[Symbol.asyncDispose]();
     }
 }

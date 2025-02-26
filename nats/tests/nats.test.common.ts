@@ -20,16 +20,41 @@
 import { wsconnect } from "@nats-io/nats-core";
 import { NatsClient } from "../mod.ts";
 import { fromFileUrl } from "jsr:@std/path";
+import { configure, getConsoleSink, getLogger, type Logger } from "@logtape/logtape";
+import { NATS_Status, nats_status } from "../src/state_container.ts";
 
 export async function get_test_nats_client(): Promise<{
     client: NatsClient;
     dispose: () => Promise<void>;
+    logger: Logger;
 }> {
+    await configure({
+        sinks: {
+            console: getConsoleSink(),
+        },
+        loggers: [
+            {
+                category: ["app", "nats"],
+                sinks: ["console"],
+                lowestLevel: "debug",
+            },
+            {
+                category: ["logtape", "meta"],
+                lowestLevel: "warning",
+            },
+        ],
+        reset: true,
+    });
+
+    const logger = getLogger(["app", "nats", "tests"]);
+
     const server = new Deno.Command("nats-server", {
         args: ["-c", fromFileUrl(new URL("test.nats.conf", import.meta.url))],
         stdout: "null",
         stderr: "null",
     }).spawn();
+
+    nats_status.value = NATS_Status.Connecting;
 
     let server_killed = false;
 
@@ -41,15 +66,18 @@ export async function get_test_nats_client(): Promise<{
 
     const nats = await wsconnect({ servers: ["ws://localhost:1001"] });
 
+    nats_status.value = NATS_Status.Connected;
     const client = new NatsClient(nats);
 
     return {
         client,
         dispose: async () => {
+            nats_status.value = NATS_Status.Disconnected;
             await nats.drain();
             server_killed = true;
             server.kill();
             await server.status;
         },
+        logger,
     };
 }
