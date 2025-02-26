@@ -18,6 +18,7 @@
  */
 
 import { getLogger } from "@logtape/logtape";
+import { wait } from "@deno-plc/utils/wait";
 
 export const logger = getLogger(["app", "nats"]);
 
@@ -25,20 +26,49 @@ export const dispose_registry = new FinalizationRegistry<string>((subject) => {
     logger.warn`${subject} was not disposed correctly. This leads to memory leaks.`;
 });
 
-/**
- * The fetch strategy for a source.
- */
-export enum FetchStrategy {
+export interface RetryPolicy {
     /**
-     * Don't fetch at all. Only recommended for values that change on a regular basis.
+     * Minimum delay
      */
-    Off,
+    min_delay: number;
+
     /**
-     * Fetch the latest value using NATS Core Request/Response.
+     * Maximum delay
      */
-    Unicast,
+    max_delay: number;
+
     /**
-     * Fetch the latest value using NATS Core Publish/Subscribe. (Response is sent to all subscribers)
+     * Factor to increase the delay
      */
-    Multicast,
+    factor: number;
+
+    /**
+     * jitter factor (0=no jitter, 1=delay between min_delay and max_delay)
+     */
+    jitter: number;
+}
+
+export const default_retry_policy: RetryPolicy = {
+    min_delay: 100,
+    max_delay: 20_000,
+    factor: 1.5,
+    jitter: 0.5,
+};
+
+export class RetryManager {
+    constructor(readonly policy: RetryPolicy) {
+        this.#delay = policy.min_delay;
+    }
+
+    #delay: number;
+
+    public async wait() {
+        this.#delay = Math.max(Math.min(this.#delay * this.policy.factor * (1 + (Math.random() * 2 - 1) * this.policy.jitter), this.policy.max_delay), this.policy.min_delay);
+
+        await wait(this.#delay);
+    }
+
+    public reset() {
+        this.#delay = this.policy.min_delay;
+    }
 }

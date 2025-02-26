@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { OnceLock } from "@deno-plc/utils/once_lock";
-import { type Signal, signal } from "@deno-plc/signals";
-import type { NatsClient } from "./mod.ts";
+import type { BlobSinkOptions } from "./blob.sink.ts";
+import type { BlobSourceOptions } from "./blob.source.ts";
 
-// #[non_exhaustive]
-export enum NATS_Status {
-    NotConfigured,
-    Connecting,
-    Connected,
-    Disconnected,
-    Reconnecting,
-    Error,
-}
-
-export const nats_client = new OnceLock<NatsClient>();
-export const nats_status: Signal<NATS_Status> = signal(NATS_Status.NotConfigured);
+export interface BlobOptions extends BlobSinkOptions, BlobSourceOptions { }

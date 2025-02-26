@@ -21,19 +21,18 @@ import type { Subscription } from "@nats-io/nats-core";
 import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor } from "./pub_crate.ts";
 import { dispose_registry, logger } from "./shared.ts";
 import { MapSignal } from "@deno-plc/signal-utils/map";
-import { FetchStrategy, type NatsClient } from "../mod.ts";
 import type { ValueType } from "@std/msgpack/encode";
 import { decode } from "@std/msgpack/decode";
+import type { NatsClient } from "./client.ts";
 
 /**
  * Options for subscribing to a map
  */
 export interface MapSinkOptions {
     /**
-     * Enable fetching the latest value on startup. Recommended for values that do not change on a regular basis. The Source may always override this
-     * @default Off
+     * allows MapSinks to fetch the latest value. Recommended for values that do not change on a regular basis.
      */
-    fetch?: FetchStrategy;
+    readonly enable_fetching?: boolean;
 }
 
 export class MapSinkInner {
@@ -42,13 +41,13 @@ export class MapSinkInner {
 
         this.#run().then();
 
-        if (opt.fetch === FetchStrategy.Unicast) {
-            client.request(`%map_source_v1%.${subject}`).then((msg) => {
-                this.#apply_update(msg.data);
-            });
-        } else if (opt.fetch === FetchStrategy.Multicast) {
-            client.publish(`%map_source_v1%.${subject}`, new Uint8Array());
-        }
+        // if (opt.fetch === FetchStrategy.Unicast) {
+        //     client.request(`%map_source_v1%.${subject}`).then((msg) => {
+        //         this.#apply_update(msg.data);
+        //     });
+        // } else if (opt.fetch === FetchStrategy.Multicast) {
+        //     client.publish(`%map_source_v1%.${subject}`, new Uint8Array());
+        // }
     }
 
     #apply_update(msg: Uint8Array) {

@@ -18,10 +18,10 @@
  */
 
 import type { Subscription } from "@nats-io/nats-core";
-import type { NatsClient } from "../mod.ts";
 import { $pub_crate$_constructor } from "./pub_crate.ts";
 import { dispose_registry, logger } from "./shared.ts";
 import { encode, type ValueType } from "@std/msgpack/encode";
+import type { NatsClient } from "./client.ts";
 
 export interface MapSourceOptions {
     /**
@@ -76,7 +76,7 @@ export class MapSource {
         return src;
     }
 
-    #current_value = new Map<string, { value: ValueType; last_update: number }>();
+    #current_value = new Map<string, { value: ValueType; last_update: number; }>();
 
     #send(content: ValueType) {
         this.client.publish(`%map_sink_v1%.${this.subject}`, encode(content));
@@ -88,7 +88,7 @@ export class MapSource {
         });
     }
 
-    #send_update(filter: (_: [string, { value: ValueType; last_update: number }]) => boolean) {
+    #send_update(filter: (_: [string, { value: ValueType; last_update: number; }]) => boolean) {
         const now = performance.now();
         this.#send(Object.fromEntries(
             this
