@@ -17,22 +17,35 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { NatsConnection, PublishOptions, Msg, SubscriptionOptions, Subscription, Payload, RequestManyOptions, RequestOptions } from "@nats-io/nats-core";
+import type {
+    Msg,
+    NatsConnection,
+    Payload,
+    PublishOptions,
+    RequestManyOptions,
+    RequestOptions,
+    Subscription,
+    SubscriptionOptions,
+} from "@nats-io/nats-core";
 import { useRef } from "preact/hooks";
 import type { Signal } from "@deno-plc/signals";
-import { type BlobSourceOptions, BlobSource } from "./blob.source.ts";
-import type { NATS_Status } from "./state_container.ts";
-import { BlobSinkInner, type BlobSinkOptions, BlobSink } from "./blob.sink.ts";
-import { MapSinkInner, type MapSinkOptions, MapSink } from "./map.sink.ts";
-import { type MapSourceOptions, MapSource } from "./map.source.ts";
+import { BlobSource, type BlobSourceOptions } from "./blob.source.ts";
+import { type NATS_Status, nats_status as nats_status_signal } from "./state_container.ts";
+import { BlobSink, BlobSinkInner, type BlobSinkOptions } from "./blob.sink.ts";
+import { MapSink, MapSinkInner, type MapSinkOptions } from "./map.sink.ts";
+import { MapSource, type MapSourceOptions } from "./map.source.ts";
 import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor, $pub_crate$_inner, $pub_crate$_map_subscriptions } from "./pub_crate.ts";
-import type { RetryPolicy } from "./shared.ts";
+import { RetryManager, type RetryPolicy } from "./shared.ts";
 
 /**
  * A wrapper around the NATS connection that adds some convenience methods for PLC-related tasks. All standard methods are proxied 1:1.
  */
 export class NatsClient {
-    constructor(readonly core: NatsConnection, readonly nats_status: Signal<NATS_Status> = nats_status, public default_retry_policy: RetryPolicy = default_retry_policy) {
+    constructor(
+        readonly core: NatsConnection,
+        readonly nats_status: Signal<NATS_Status> = nats_status_signal,
+        public default_retry_policy: RetryPolicy = RetryManager.default(),
+    ) {
     }
 
     public publish(subject: string, data: Uint8Array, options?: PublishOptions): void {
@@ -66,7 +79,7 @@ export class NatsClient {
         if (this[$pub_crate$_blob_subscriptions].has(subject)) {
             inner = this[$pub_crate$_blob_subscriptions].get(subject)!;
         } else {
-            inner = new BlobSinkInner(this, subject, opt ?? {});
+            inner = BlobSinkInner[$pub_crate$_constructor](this, subject, opt);
             this[$pub_crate$_blob_subscriptions].set(subject, inner);
         }
         return BlobSink[$pub_crate$_constructor](inner);
@@ -84,7 +97,7 @@ export class NatsClient {
             if (this[$pub_crate$_blob_subscriptions].has(subject)) {
                 inner = this[$pub_crate$_blob_subscriptions].get(subject)!;
             } else {
-                inner = new BlobSinkInner(this, subject, opt ?? {});
+                inner = BlobSinkInner[$pub_crate$_constructor](this, subject, opt);
                 this[$pub_crate$_blob_subscriptions].set(subject, inner);
             }
             sink.current = BlobSink[$pub_crate$_constructor](inner);
@@ -99,7 +112,7 @@ export class NatsClient {
         if (this[$pub_crate$_map_subscriptions].has(subject)) {
             inner = this[$pub_crate$_map_subscriptions].get(subject)!;
         } else {
-            inner = new MapSinkInner(this, subject, opt ?? {});
+            inner = MapSinkInner[$pub_crate$_constructor](this, subject, opt);
             this[$pub_crate$_map_subscriptions].set(subject, inner);
         }
         return MapSink[$pub_crate$_constructor](inner);

@@ -28,31 +28,30 @@ import { NATS_Status } from "./state_container.ts";
 export interface BlobSourceOptions {
     /**
      * Sends a full update every `periodic_update` milliseconds.
+     * @default 0
      */
     readonly periodic_update?: number;
 
     /**
      * Send a version advertisement every `periodic_advertise` milliseconds.
+     * @default 0
      */
     readonly periodic_advertise?: number;
 
     /**
      * allows BlobSinks to fetch the latest value. Recommended for values that do not change on a regular basis.
+     * @default true
      */
     readonly enable_fetching?: boolean;
 }
 
 export class BlobSource {
     #registration_id = Symbol();
-    private constructor(readonly client: NatsClient, readonly subject: string, readonly options: BlobSourceOptions) {
+    private constructor(readonly client: NatsClient, readonly subject: string, readonly options: Required<BlobSourceOptions>) {
         dispose_registry.register(this, `subscription for ${this.subject}`, this.#registration_id);
 
         if (this.options.enable_fetching) {
             this.#run_fetch();
-        }
-
-        if (this.options.periodic_advertise ?? 0 > 0) {
-            assert(this.options.enable_fetching);
         }
 
         this.#reconnect_release = client.nats_status.subscribe((status) => {
@@ -65,10 +64,16 @@ export class BlobSource {
     }
 
     static [$pub_crate$_constructor](client: NatsClient, subject: string, initial: Uint8Array, options?: BlobSourceOptions): BlobSource {
-        if (options?.periodic_advertise ?? 0 > 0) {
-            assert(options?.enable_fetching, "periodic_advertise requires enable_fetching");
+        const full_options = {
+            periodic_update: 0,
+            periodic_advertise: 0,
+            enable_fetching: true,
+            ...options,
+        };
+        if (full_options.periodic_advertise > 0) {
+            assert(options?.enable_fetching ?? true, "periodic_advertise requires enable_fetching");
         }
-        const src = new BlobSource(client, subject, options ?? {});
+        const src = new BlobSource(client, subject, full_options);
         src.update(initial);
         return src;
     }
@@ -98,7 +103,6 @@ export class BlobSource {
 
         this.#last_value = data;
 
-
         const required_length = data.length + 1;
 
         if (required_length > this.#full_update.length || data.length > required_length * 1.5 + 20) {
@@ -112,7 +116,7 @@ export class BlobSource {
 
         this.#periodic_update();
 
-        if (this.options.periodic_advertise ?? 0 > 0) {
+        if (this.options.periodic_advertise > 0) {
             this.#hash = new Uint8Array(await crypto.subtle.digest("SHA-256", data));
             this.#periodic_advertise();
         }
@@ -122,7 +126,7 @@ export class BlobSource {
 
     #periodic_update() {
         clearTimeout(this.#periodic_update_timeout_id);
-        if (this.options.periodic_update ?? 0 > 0) {
+        if (this.options.periodic_update > 0) {
             const weak_this = new WeakRef(this);
 
             this.#periodic_update_timeout_id = setTimeout(() => {
@@ -130,13 +134,13 @@ export class BlobSource {
                 if (!self) return;
                 self.client.publish(`%blob_sink_v1%.${self.subject}`, self.#full_update);
                 self.#periodic_update();
-            });
+            }, this.options.periodic_update);
         }
     }
 
     #periodic_advertise() {
         clearTimeout(this.#periodic_advertise_timeout_id);
-        if (this.options.periodic_advertise ?? 0 > 0) {
+        if (this.options.periodic_advertise > 0) {
             const weak_this = new WeakRef(this);
 
             this.#periodic_advertise_timeout_id = setTimeout(() => {
@@ -147,7 +151,7 @@ export class BlobSource {
                 message.set(self.#hash, 1);
                 self.client.publish(`%blob_sink_v1%.${self.subject}`, message);
                 self.#periodic_advertise();
-            });
+            }, this.options.periodic_advertise);
         }
     }
 

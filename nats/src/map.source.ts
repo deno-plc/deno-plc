@@ -19,35 +19,31 @@
 
 import type { Subscription } from "@nats-io/nats-core";
 import { $pub_crate$_constructor } from "./pub_crate.ts";
-import { dispose_registry, logger } from "./shared.ts";
+import { dispose_registry } from "./shared.ts";
 import { encode, type ValueType } from "@std/msgpack/encode";
 import type { NatsClient } from "./client.ts";
 
 export interface MapSourceOptions {
     /**
      * Sends a full update every `periodic_update` milliseconds.
+     * @default 0
      */
-    periodic_update?: number;
+    readonly periodic_update?: number;
 
     /**
      * allows MapSinks to fetch the latest value. Recommended for values that do not change on a regular basis.
      * @default true
      */
-    enable_fetching?: boolean;
-
-    /**
-     * @default true
-     */
-    allow_multicast_fetch?: boolean;
+    readonly enable_fetching?: boolean;
 }
 
 export class MapSource {
     #registration_id = Symbol();
-    private constructor(readonly client: NatsClient, readonly subject: string, readonly options: MapSourceOptions) {
+    private constructor(readonly client: NatsClient, readonly subject: string, readonly options: Required<MapSourceOptions>) {
         dispose_registry.register(this, `subscription for ${this.subject}`, this.#registration_id);
         this.#periodic_update();
 
-        if (this.options.enable_fetching ?? true) {
+        if (this.options.enable_fetching) {
             this.#run_fetch();
         }
     }
@@ -59,12 +55,6 @@ export class MapSource {
         for await (const msg of this.#fetch_subscription) {
             if (msg.reply) {
                 msg.respond(encode(Object.fromEntries(this.#current_value.entries().map(([key, { value }]) => [key, value]))));
-            } else {
-                if (this.options.allow_multicast_fetch ?? true) {
-                    this.#send_update(() => true);
-                } else {
-                    logger.getChild(this.subject).warn`Received multicast fetch request. [now allowed] Ignoring.`;
-                }
             }
         }
     }
@@ -72,11 +62,15 @@ export class MapSource {
     periodic_timeout_id: number = -1;
 
     static [$pub_crate$_constructor](client: NatsClient, subject: string, options?: MapSourceOptions): MapSource {
-        const src = new MapSource(client, subject, options ?? {});
+        const src = new MapSource(client, subject, {
+            periodic_update: 0,
+            enable_fetching: true,
+            ...options,
+        });
         return src;
     }
 
-    #current_value = new Map<string, { value: ValueType; last_update: number; }>();
+    #current_value = new Map<string, { value: ValueType; last_update: number }>();
 
     #send(content: ValueType) {
         this.client.publish(`%map_sink_v1%.${this.subject}`, encode(content));
@@ -88,7 +82,7 @@ export class MapSource {
         });
     }
 
-    #send_update(filter: (_: [string, { value: ValueType; last_update: number; }]) => boolean) {
+    #send_update(filter: (_: [string, { value: ValueType; last_update: number }]) => boolean) {
         const now = performance.now();
         this.#send(Object.fromEntries(
             this

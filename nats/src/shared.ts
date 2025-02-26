@@ -63,12 +63,19 @@ export class RetryManager {
     #delay: number;
 
     public async wait() {
-        this.#delay = Math.max(Math.min(this.#delay * this.policy.factor * (1 + (Math.random() * 2 - 1) * this.policy.jitter), this.policy.max_delay), this.policy.min_delay);
+        this.#delay = Math.max(
+            Math.min(this.#delay * this.policy.factor * (1 + (Math.random() * 2 - 1) * this.policy.jitter), this.policy.max_delay),
+            this.policy.min_delay,
+        );
 
         await wait(this.#delay);
     }
 
     public reset() {
         this.#delay = this.policy.min_delay;
+    }
+
+    static default(): RetryPolicy {
+        return default_retry_policy;
     }
 }

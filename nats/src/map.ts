@@ -17,7 +17,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type { BlobSinkOptions } from "./blob.sink.ts";
-import type { BlobSourceOptions } from "./blob.source.ts";
+import type { MapSinkOptions } from "./map.sink.ts";
+import type { MapSourceOptions } from "./map.source.ts";
 
-export interface BlobOptions extends BlobSinkOptions, BlobSourceOptions {}
+/**
+ * Options for MapSinks and MapSources
+ */
+export interface MapOptions extends MapSinkOptions, MapSourceOptions {}

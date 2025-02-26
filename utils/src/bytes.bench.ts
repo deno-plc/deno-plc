@@ -36,7 +36,6 @@ function byteEqualsU64(a: BigUint64Array, b: BigUint64Array): boolean {
     return true;
 }
 
-
 const diff: [ArrayBuffer, ArrayBuffer][] = [];
 const same: [ArrayBuffer, ArrayBuffer][] = [];
 

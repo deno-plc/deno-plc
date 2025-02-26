@@ -31,23 +31,28 @@ import type { NatsClient } from "./client.ts";
 export interface MapSinkOptions {
     /**
      * allows MapSinks to fetch the latest value. Recommended for values that do not change on a regular basis.
+     * @default true
      */
     readonly enable_fetching?: boolean;
 }
 
 export class MapSinkInner {
-    constructor(readonly client: NatsClient, readonly subject: string, readonly opt: MapSinkOptions) {
+    private constructor(readonly client: NatsClient, readonly subject: string, readonly opt: Required<MapSinkOptions>) {
         this.#subscription = client.subscribe(`%map_sink_v1%.${subject}`);
 
         this.#run().then();
 
-        // if (opt.fetch === FetchStrategy.Unicast) {
-        //     client.request(`%map_source_v1%.${subject}`).then((msg) => {
-        //         this.#apply_update(msg.data);
-        //     });
-        // } else if (opt.fetch === FetchStrategy.Multicast) {
-        //     client.publish(`%map_source_v1%.${subject}`, new Uint8Array());
-        // }
+        if (opt.enable_fetching) {
+            client.request(`%map_source_v1%.${subject}`).then((msg) => {
+                this.#apply_update(msg.data);
+            });
+        }
+    }
+    static [$pub_crate$_constructor](client: NatsClient, subject: string, opt?: MapSinkOptions): MapSinkInner {
+        return new MapSinkInner(client, subject, {
+            enable_fetching: true,
+            ...opt,
+        });
     }
 
     #apply_update(msg: Uint8Array) {

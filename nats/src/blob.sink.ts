@@ -33,12 +33,14 @@ import { NATS_Status } from "./state_container.ts";
 export interface BlobSinkOptions {
     /**
      * Enable fetching the latest value on startup. Recommended for values that do not change on a regular basis.
+     * @default true
      */
     readonly enable_fetching?: boolean;
 
     /**
      * It there is no message for this amount of time, the value will be marked as invalid.
      * `periodic_update` or `periodic_advertise` should be enabled for the source
+     * @default 0
      */
     readonly source_timeout?: number;
 
@@ -50,8 +52,8 @@ export interface BlobSinkOptions {
 }
 
 export class BlobSinkInner {
-    constructor(readonly client: NatsClient, readonly subject: string, readonly opt: BlobSinkOptions) {
-        this.#retry = new RetryManager(this.opt.retry_policy ?? this.client.default_retry_policy);
+    private constructor(readonly client: NatsClient, readonly subject: string, readonly opt: Required<BlobSinkOptions>) {
+        this.#retry = new RetryManager(this.opt.retry_policy);
         this.#buffer = new ArrayBuffer(0);
         this.value = signal(new Uint8Array(this.#buffer));
 
@@ -69,6 +71,15 @@ export class BlobSinkInner {
         });
 
         this.#reset_timeout();
+    }
+
+    static [$pub_crate$_constructor](client: NatsClient, subject: string, opt?: BlobSinkOptions): BlobSinkInner {
+        return new BlobSinkInner(client, subject, {
+            enable_fetching: true,
+            source_timeout: 0,
+            retry_policy: client.default_retry_policy,
+            ...opt,
+        });
     }
 
     #buffer: ArrayBuffer;
@@ -102,7 +113,6 @@ export class BlobSinkInner {
             if (this.destroyed) break;
             await awaitSignal(this.client.nats_status, NATS_Status.Connected);
             if (this.destroyed) break;
-
 
             logger.debug`fetching blob ${this.subject}`;
 
@@ -141,7 +151,7 @@ export class BlobSinkInner {
             } else if (data[0] === 1) {
                 // advertisement
                 const hash = data.slice(1);
-                if (!byteEquals((hash), new Uint8Array(this.#hash))) {
+                if (!byteEquals(hash, new Uint8Array(this.#hash))) {
                     logger.info`advertisement hash mismatch, fetching`;
                     this.valid.value = false;
                 }
