@@ -182,4 +182,29 @@ export class NatsClient {
         }
         return MapSink[$pub_crate$_constructor](inner, opt.schema);
     }
+
+    /**
+     * Sinks (receives) a shared map from the specified subject.
+     * Compatible with preact/hooks
+     * Important: The option should be memoized.
+     */
+    useMapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(subject: string, opt: MapSinkOptions<Schema>): MapSink<Schema> {
+        const sink = useRef<MapSink<Schema> | null>(null);
+        useEffect(() => () => {
+            sink.current?.[Symbol.dispose]?.();
+        }, []);
+
+        if (sink.current?.[$pub_crate$_inner].subject !== subject || sink.current?.schema !== opt.schema) {
+            let inner: MapSinkInner;
+            if (this[$pub_crate$_blob_subscriptions].has(subject)) {
+                inner = this[$pub_crate$_map_subscriptions].get(subject)!;
+            } else {
+                inner = MapSinkInner[$pub_crate$_constructor](this, subject, opt);
+                this[$pub_crate$_map_subscriptions].set(subject, inner);
+            }
+            sink.current?.[Symbol.dispose]?.();
+            sink.current = MapSink[$pub_crate$_constructor](inner, opt.schema);
+        }
+        return sink.current;
+    }
 }
