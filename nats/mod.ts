@@ -28,8 +28,9 @@ export { NATS_Status, nats_status } from "./src/state_container.ts";
 export { NatsClient } from "./src/client.ts";
 export { init_nats } from "./src/init.ts";
 
-export type { BlobSink, BlobSinkOptions } from "./src/blob.sink.ts";
+export type { BlobSink, BlobSinkOptions, BlobSinkLike } from "./src/blob.sink.ts";
 export type { BlobSource, BlobSourceOptions } from "./src/blob.source.ts";
 export type { BlobOptions } from "./src/blob.ts";
 export type { MapSource, MapSourceOptions } from "./src/map.source.ts";
-export type { MapSink, MapSinkOptions } from "./src/map.sink.ts";
+export type { MapSink, MapSinkOptions, MapSinkLike } from "./src/map.sink.ts";
+export { useMapSink, useBlobSink, FakeBlobSink, FakeMapSink } from "./src/hooks.ts";
