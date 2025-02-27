@@ -19,7 +19,7 @@
     },
     "imports": {
         "@coderspirit/nominal": "npm:@coderspirit/nominal@^4.1.1",
-        "@deno-plc/vite-plugin-deno": "jsr:@deno-plc/vite-plugin-deno@^2.3.0",
+        "@deno-plc/vite-plugin-deno": "jsr:@deno-plc/vite-plugin-deno@^2.3.3",
         "@luca/cases": "jsr:@luca/cases@^1.0.0",
         "@nats-io/nats-core": "jsr:@nats-io/nats-core@^3.0.0-48",
         "@prefresh/core": "npm:@prefresh/core@^1.5.3",

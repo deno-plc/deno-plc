@@ -326,7 +326,17 @@ export class MapSinkInner {
     }
 }
 
-export class MapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.ZodAny> {
+export interface MapSinkLike<T> {
+    readonly value: MapSignal<string, T | null>;
+    readonly raw_value: MapSignal<string, ValueType>;
+    readonly valid: boolean;
+
+    [Symbol.asyncDispose](): Promise<void>;
+    [Symbol.dispose](): void;
+    dispose(): Promise<void>;
+}
+
+export class MapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.ZodAny> implements MapSinkLike<Schema["_output"]> {
     private constructor(inner: MapSinkInner, readonly schema: Schema) {
         this[$pub_crate$_inner] = inner;
         inner.instances++;

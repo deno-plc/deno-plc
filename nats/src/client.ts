@@ -127,10 +127,11 @@ export class NatsClient {
      * Compatible with preact/hooks
      */
     useBlobSink(subject: string, opt?: BlobSinkOptions): BlobSink {
+        // always sync hooks with placeholders in hooks.ts !!
         const sink = useRef<BlobSink | null>(null);
         useEffect(() => () => {
             sink.current?.[Symbol.dispose]?.();
-        }, []);
+        }, [true]);
         if (sink.current?.[$pub_crate$_inner].subject !== subject) {
             let inner: BlobSinkInner;
             if (this[$pub_crate$_blob_subscriptions].has(subject)) {
@@ -186,13 +187,14 @@ export class NatsClient {
     /**
      * Sinks (receives) a shared map from the specified subject.
      * Compatible with preact/hooks
-     * Important: The option should be memoized.
+     * Important: The schema should be memoized.
      */
     useMapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(subject: string, opt: MapSinkOptions<Schema>): MapSink<Schema> {
+        // always sync hooks with placeholders in hooks.ts !!
         const sink = useRef<MapSink<Schema> | null>(null);
         useEffect(() => () => {
             sink.current?.[Symbol.dispose]?.();
-        }, []);
+        }, [true]);
 
         if (sink.current?.[$pub_crate$_inner].subject !== subject || sink.current?.schema !== opt.schema) {
             let inner: MapSinkInner;

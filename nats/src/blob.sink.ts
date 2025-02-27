@@ -184,7 +184,17 @@ export class BlobSinkInner {
     }
 }
 
-export class BlobSink {
+export interface BlobSinkLike {
+    readonly value: Uint8Array;
+    peek(): Uint8Array;
+    readonly valid: boolean;
+
+    dispose(): Promise<void>;
+    [Symbol.asyncDispose](): Promise<void>;
+    [Symbol.dispose](): void;
+}
+
+export class BlobSink implements BlobSinkLike {
     private constructor(inner: BlobSinkInner) {
         this[$pub_crate$_inner] = inner;
         assert(!inner.destroyed);

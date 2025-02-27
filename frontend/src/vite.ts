@@ -80,11 +80,13 @@ export function config(o: ConfigOptions): InlineConfig {
 
                     ["npm:tweetnacl@1.0.3", "https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/+esm#standalone"],
                 ]),
-                exclude: [/@xterm\//, /@tauri-apps/],
-            }),
+                legacy_npm: ["@xterm/xterm", "@xterm/addon-fit"],
+                exclude: [/@tauri-apps/, /\/v3\//, /@xterm\/xterm\/css/],
+                hot_update_min_time: 500,
+            }) as Plugin & { name: string },
             prefresh({
                 exclude: [/^npm/, /registry.npmjs.org/, /^http/], // don't inject HMR into the HMR code and libs
-            }) as Plugin,
+            }) as Plugin & { name: string },
         ],
         esbuild: {
             jsx: "automatic",

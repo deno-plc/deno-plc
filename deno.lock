@@ -1,7 +1,7 @@
 {
   "version": "4",
   "specifiers": {
-    "jsr:@deno-plc/vite-plugin-deno@^2.3.0": "2.3.2",
+    "jsr:@deno-plc/vite-plugin-deno@^2.3.3": "2.3.3",
     "jsr:@hono/hono@^4.6.14": "4.7.2",
     "jsr:@logtape/logtape@0.8": "0.8.2",
     "jsr:@logtape/logtape@~0.8.2": "0.8.2",
@@ -76,22 +76,20 @@
     "@deno-plc/vite-plugin-deno@2.3.0": {
       "integrity": "feb70fa362cb9867e0dc0f58f7befda3552c430028676d24191257a500ae2d54",
       "dependencies": [
-        "jsr:@std/assert@0.223",
-        "jsr:@std/assert@~0.225.2",
-        "jsr:@std/path@~0.225.1",
+        "jsr:@std/assert@^1.0.9",
         "jsr:@std/semver@^1.0.2",
         "npm:@coderspirit/nominal",
         "npm:acorn-walk@^8.3.3",
         "npm:acorn@^8.12.1",
         "npm:lebab@^3.2.4",
         "npm:resolve.exports@^2.0.2",
-        "npm:validate-npm-package-name@^5.0.1",
+        "npm:validate-npm-package-name@6",
         "npm:vite@^5.2.12",
         "npm:zod@^3.22.5"
       ]
     },
-    "@deno-plc/vite-plugin-deno@2.3.2": {
-      "integrity": "60e973f5517027708b94e5c83df0c7dfe020005613c59c5bb5349384ebbc62c4",
+    "@deno-plc/vite-plugin-deno@2.3.3": {
+      "integrity": "3b68155d1e3794cb18fa3827c805db009e2c90008010639293a0aa461ab82cd0",
       "dependencies": [
         "jsr:@logtape/logtape@~0.8.2",
         "jsr:@std/assert@0.223",
@@ -1852,7 +1850,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@deno-plc/vite-plugin-deno@^2.3.0",
+      "jsr:@deno-plc/vite-plugin-deno@^2.3.3",
       "jsr:@hono/hono@^4.6.14",
       "jsr:@logtape/logtape@0.8",
       "jsr:@luca/cases@1",

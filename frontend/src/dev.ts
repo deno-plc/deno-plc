@@ -27,6 +27,31 @@ import { DevSSR } from "./dev.ssr.tsx";
 import { serveFile } from "@std/http";
 import { getPath } from "./material-icons.ssr.ts";
 import { Hono } from "hono";
+import { configure, getConsoleSink } from "@logtape/logtape";
+
+await configure({
+    sinks: {
+        console: getConsoleSink(),
+    },
+    loggers: [
+        {
+            category: "app",
+            lowestLevel: "debug",
+            sinks: ["console"],
+        },
+        {
+            category: "vite-plugin-deno",
+            lowestLevel: "info",
+            sinks: ["console"],
+        },
+        {
+            category: ["logtape", "meta"],
+            lowestLevel: "warning",
+            sinks: ["console"],
+        },
+    ],
+    reset: true,
+});
 
 const vite_cfg = config({
     env: "browser",
