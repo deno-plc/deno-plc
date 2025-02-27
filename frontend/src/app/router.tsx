@@ -23,7 +23,7 @@ import { useEffect } from "preact/hooks";
 import { getLogger } from "@logtape/logtape";
 import { LogPage } from "@deno-plc/ui/console";
 import { TestPage } from "./components/TestPage.tsx";
-import { EditNightly } from "../../../ui/src/nightly/Nightly.tsx";
+import { EditNightly } from "@deno-plc/ui/nightly";
 import { nightly } from "./nightly.ts";
 
 const logger = getLogger(["app", "router"]);

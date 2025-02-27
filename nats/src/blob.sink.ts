@@ -26,7 +26,7 @@ import { awaitSignal } from "@deno-plc/signal-utils/async";
 import { assert } from "@std/assert/assert";
 import type { NatsClient } from "./client.ts";
 import { NATS_Status } from "./state_container.ts";
-import { wait } from "../../utils/src/wait.ts";
+import { wait } from "@deno-plc/utils/wait";
 
 /**
  * Options for subscribing to a blob

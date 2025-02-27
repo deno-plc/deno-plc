@@ -20,7 +20,7 @@
 import { ComponentChildren } from "preact";
 import { Ms } from "@deno-plc/ui/icons-ms";
 import { navigate, useLocation } from "@deno-plc/router";
-import { get_nightly } from "../../../utils/src/nightly.ts";
+import { get_nightly } from "@deno-plc/utils/nightly";
 
 function NavGroup(p: {
     title: string;
