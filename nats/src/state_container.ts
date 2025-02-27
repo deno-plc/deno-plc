@@ -25,13 +25,37 @@ import type { NatsClient } from "../mod.ts";
  * #[non_exhaustive]
  */
 export enum NATS_Status {
-    NotConfigured,
-    Connecting,
-    Connected,
-    Disconnected,
-    Reconnecting,
-    Error,
+    NotConfigured = "NotConfigured",
+    Connecting = "Connecting",
+    Connected = "Connected",
+    Disconnected = "Disconnected",
+    Reconnecting = "Reconnecting",
+    Error = "Error",
 }
 
+const client_symbol = Symbol.for("NATS_Client");
+const status_symbol = Symbol.for("NATS_Status");
+
 export const nats_client = new OnceLock<NatsClient>();
-export const nats_status: Signal<NATS_Status> = signal(NATS_Status.NotConfigured);
+export const nats_status: Signal<NATS_Status> = status_symbol in self
+    ? (self[status_symbol] as Signal<NATS_Status>)
+    : signal(NATS_Status.NotConfigured);
+
+if (client_symbol in self) {
+    const pr = self[client_symbol] as Promise<NatsClient>;
+    pr.then((client) => {
+        nats_client.get_or_init(() => client);
+    });
+} else {
+    Object.defineProperty(self, client_symbol, {
+        value: (async () => {
+            await nats_client.get();
+        })(),
+    });
+}
+
+if (!(status_symbol in self)) {
+    Object.defineProperty(self, status_symbol, {
+        value: nats_status,
+    });
+}
