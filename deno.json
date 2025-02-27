@@ -14,6 +14,7 @@
         "check-ci": "deno fmt --check & deno lint & deno run -A npm:cspell@^8.14.2 lint . --no-progress & deno test -A --permit-no-files --ignore=\"**/nats/**\"",
         "check:license": "deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts",
         "check:spell": "deno run -A npm:cspell@^8.14.2 lint .",
+        "check:test": "deno test -A",
         "dev": "deno run -A frontend/src/dev.ts"
     },
     "imports": {

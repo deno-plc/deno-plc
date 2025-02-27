@@ -20,33 +20,22 @@
 import { computed } from "@deno-plc/signals";
 import { awaitSignal } from "@deno-plc/signal-utils/async";
 import { get_test_nats_client } from "./nats.test.common.ts";
-import { FetchStrategy } from "../src/shared.ts";
+import type { MapOptions } from "../src/map.ts";
+import z from "zod";
 
-Deno.test("map transfer.fetch unicast", async () => {
+Deno.test("map transfer.fetch", async () => {
     const { client, dispose } = await get_test_nats_client();
 
-    const src = client.map_source("test");
+    const opt = {
+        enable_fetching: true,
+        schema: z.number(),
+    } satisfies MapOptions;
+
+    using src = client.map_source("test", opt);
     src.set("foo", 5);
     src.set("bar", 8);
+    await using sink = client.map_sink("test", opt);
 
-    const sink = client.map_sink("test", {
-        fetch: FetchStrategy.Unicast,
-    });
-    const sink_value_matches = computed(() => sink.value.get("foo") === 5 && sink.value.get("bar") === 8);
-    await awaitSignal(sink_value_matches, true);
-    await dispose();
-});
-
-Deno.test("map transfer.fetch multicast", async () => {
-    const { client, dispose } = await get_test_nats_client();
-
-    const src = client.map_source("test");
-    src.set("foo", 5);
-    src.set("bar", 8);
-
-    const sink = client.map_sink("test", {
-        fetch: FetchStrategy.Multicast,
-    });
     const sink_value_matches = computed(() => sink.value.get("foo") === 5 && sink.value.get("bar") === 8);
     await awaitSignal(sink_value_matches, true);
     await dispose();
@@ -54,8 +43,14 @@ Deno.test("map transfer.fetch multicast", async () => {
 
 Deno.test("map transfer.update", async () => {
     const { client, dispose } = await get_test_nats_client();
-    const src = client.map_source("test");
-    const sink = client.map_sink("test");
+
+    const opt = {
+        enable_fetching: false,
+        schema: z.number(),
+    } satisfies MapOptions;
+
+    using src = client.map_source("test", opt);
+    await using sink = client.map_sink("test", opt);
     src.set("foo", 5);
     src.set("bar", 8);
     const sink_value_matches = computed(() => sink.value.get("foo") === 5 && sink.value.get("bar") === 8);

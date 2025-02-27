@@ -20,23 +20,25 @@
 import { computed } from "@deno-plc/signals";
 import { awaitSignal } from "@deno-plc/signal-utils/async";
 import { get_test_nats_client } from "./nats.test.common.ts";
+import type { BlobOptions } from "../src/blob.ts";
 
 Deno.test("blob transfer.fetch", async () => {
     const { client, dispose } = await get_test_nats_client();
+
+    const opt: BlobOptions = {
+        enable_fetching: true,
+    };
+
     const value = new Uint8Array(15);
     crypto.getRandomValues(value);
-    const _src = client.blob_source("test", value, {
-        enable_fetching: true,
-    });
-    const sink = client.blob_sink("test", {
-        enable_fetching: true,
-    });
+    using _src = client.blob_source("test", value, opt);
+    await using sink = client.blob_sink("test", opt);
     const sink_value_matches = computed(() => {
         if (sink.value.length !== value.length) return false;
         for (let i = 0; i < value.length; i++) {
             if (sink.value[i] !== value[i]) return false;
         }
-        return true;
+        return sink.valid;
     });
     await awaitSignal(sink_value_matches, true);
     await dispose();
@@ -44,16 +46,21 @@ Deno.test("blob transfer.fetch", async () => {
 
 Deno.test("blob transfer.update", async () => {
     const { client, dispose } = await get_test_nats_client();
+
+    const opt: BlobOptions = {
+        enable_fetching: false,
+    };
+
     const value = new Uint8Array(15);
     crypto.getRandomValues(value);
-    const src = client.blob_source("test", new Uint8Array(0));
-    const sink = client.blob_sink("test");
+    using src = client.blob_source("test", new Uint8Array(0), opt);
+    await using sink = client.blob_sink("test", opt);
     const sink_value_matches = computed(() => {
         if (sink.value.length !== value.length) return false;
         for (let i = 0; i < value.length; i++) {
             if (sink.value[i] !== value[i]) return false;
         }
-        return true;
+        return sink.valid;
     });
     src.update(value);
     await awaitSignal(sink_value_matches, true);

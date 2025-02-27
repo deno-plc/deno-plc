@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,167 +17,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {
-    Msg,
-    NatsConnection,
-    Payload,
-    PublishOptions,
-    RequestManyOptions,
-    RequestOptions,
-    Subscription,
-    SubscriptionOptions,
-} from "@nats-io/nats-core";
-import { nats_client, NATS_Status, nats_status } from "./state_container.ts";
-import { assert } from "@std/assert/assert";
-import { wait } from "@deno-plc/utils/wait";
-import { logger } from "./src/shared.ts";
-import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor, $pub_crate$_map_subscriptions } from "./src/pub_crate.ts";
-import { BlobSink, BlobSinkInner, type BlobSinkOptions } from "./src/blob.sink.ts";
-import { BlobSource, type BlobSourceOptions } from "./src/blob.source.ts";
-import { MapSource, type MapSourceOptions } from "./src/map.source.ts";
-import { MapSink, MapSinkInner, type MapSinkOptions } from "./src/map.sink.ts";
-
-export { NATS_Status, nats_status } from "./state_container.ts";
+import { nats_client } from "./src/state_container.ts";
+import type { NatsClient } from "./src/client.ts";
 
 export function get_nats(): Promise<NatsClient> {
     return nats_client.get();
 }
 
-/**
- * Handles the initialization of the process global NATS client.
- * @param connect - A function that returns a promise that resolves to a NATS connection. For example `wsconnect.bind(self, { servers: ["ws://localhost:1001"] })`
- */
-export async function init_nats(connect: () => Promise<NatsConnection>): Promise<void> {
-    logger.info`initializing`;
-
-    if (nats_client.initialized) {
-        logger.warn`already initialized, skipping init`;
-        return;
-    }
-
-    nats_status.value = NATS_Status.Connecting;
-
-    const nc = await connect().catch(async (e) => {
-        logger.error`failed to connect: ${e}`;
-        nats_status.value = NATS_Status.Error;
-
-        await wait(1000);
-
-        nats_status.value = NATS_Status.Connecting;
-
-        await init_nats(connect);
-    });
-
-    if (nats_client.initialized) {
-        logger.warn`already initialized, skipping init`;
-        return;
-    }
-
-    assert(nc);
-
-    logger.info`connected`;
-
-    for (const [key, value] of Object.entries(nc.info!)) {
-        logger.info`server ${key}: ${value}`;
-    }
-
-    const client = new NatsClient(nc);
-
-    nats_client.init(client);
-
-    nats_status.value = NATS_Status.Connected;
-
-    (async () => {
-        for await (const s of nc.status()) {
-            logger.info`status: ${s.type}`;
-            // "error" | "disconnect" | "reconnect" | "reconnecting" | "update" | "ldm" | "ping" | "staleConnection" | "slowConsumer" | "forceReconnect"
-            switch (s.type) {
-                case "disconnect":
-                    nats_status.value = NATS_Status.Disconnected;
-                    break;
-                case "reconnecting":
-                    nats_status.value = NATS_Status.Reconnecting;
-                    break;
-                case "reconnect":
-                    nats_status.value = NATS_Status.Connected;
-                    break;
-                case "error":
-                    nats_status.value = NATS_Status.Error;
-                    break;
-            }
-        }
-    })().then();
-}
-
-/**
- * A wrapper around the NATS connection that adds some convenience methods for PLC-related tasks. All standard methods are proxied 1:1.
- */
-export class NatsClient {
-    constructor(readonly core: NatsConnection) {
-    }
-
-    public publish(subject: string, data: Uint8Array, options?: PublishOptions): void {
-        this.core.publish(subject, data, options);
-    }
-
-    public publishMessage(msg: Msg): void {
-        this.core.publishMessage(msg);
-    }
-
-    public respondMessage(msg: Msg): void {
-        this.core.respondMessage(msg);
-    }
-
-    public subscribe(subject: string, opts?: SubscriptionOptions): Subscription {
-        return this.core.subscribe(subject, opts);
-    }
-
-    request(subject: string, payload?: Payload, opts?: RequestOptions): Promise<Msg> {
-        return this.core.request(subject, payload, opts);
-    }
-
-    requestMany(subject: string, payload?: Payload, opts?: Partial<RequestManyOptions>): Promise<AsyncIterable<Msg>> {
-        return this.core.requestMany(subject, payload, opts);
-    }
-
-    [$pub_crate$_blob_subscriptions]: Map<string, BlobSinkInner> = new Map();
-
-    blob_sink(subject: string, opt?: BlobSinkOptions): BlobSink {
-        let inner: BlobSinkInner;
-        if (this[$pub_crate$_blob_subscriptions].has(subject)) {
-            inner = this[$pub_crate$_blob_subscriptions].get(subject)!;
-        } else {
-            inner = new BlobSinkInner(this, subject, opt ?? {});
-            this[$pub_crate$_blob_subscriptions].set(subject, inner);
-        }
-        return BlobSink[$pub_crate$_constructor](inner);
-    }
-
-    blob_source(subject: string, initial: Uint8Array, opt?: BlobSourceOptions): BlobSource {
-        return BlobSource[$pub_crate$_constructor](this, subject, initial, opt);
-    }
-
-    [$pub_crate$_map_subscriptions]: Map<string, MapSinkInner> = new Map();
-
-    map_sink(subject: string, opt?: MapSinkOptions): MapSink {
-        let inner: MapSinkInner;
-        if (this[$pub_crate$_map_subscriptions].has(subject)) {
-            inner = this[$pub_crate$_map_subscriptions].get(subject)!;
-        } else {
-            inner = new MapSinkInner(this, subject, opt ?? {});
-            this[$pub_crate$_map_subscriptions].set(subject, inner);
-        }
-        return MapSink[$pub_crate$_constructor](inner);
-    }
-
-    map_source(subject: string, opt?: MapSourceOptions): MapSource {
-        return MapSource[$pub_crate$_constructor](this, subject, opt);
-    }
-}
+export { NATS_Status, nats_status } from "./src/state_container.ts";
+export { NatsClient } from "./src/client.ts";
+export { init_nats } from "./src/init.ts";
 
 export type { BlobSink, BlobSinkOptions } from "./src/blob.sink.ts";
 export type { BlobSource, BlobSourceOptions } from "./src/blob.source.ts";
+export type { BlobOptions } from "./src/blob.ts";
 export type { MapSource, MapSourceOptions } from "./src/map.source.ts";
 export type { MapSink, MapSinkOptions } from "./src/map.sink.ts";
-
-export { FetchStrategy } from "./src/shared.ts";

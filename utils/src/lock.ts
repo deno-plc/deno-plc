@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2022-2024 Hans Schallmoser
+ * Copyright (C) 2022-2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ export class Lock {
         this.#locked = initial_locked;
     }
     #locked: boolean;
-    #waiting: (() => void)[] = [];
+    #queue: (() => void)[] = [];
 
     public lock(lock: boolean = true) {
         if (lock) {
@@ -34,15 +34,25 @@ export class Lock {
 
     public unlock() {
         this.#locked = false;
-        while (!this.#locked && this.#waiting.length) {
-            this.#waiting.shift()!();
+        this.#resume();
+    }
+
+    #resume() {
+        const next = this.#queue.shift();
+        if (next) {
+            next();
+            queueMicrotask(() => {
+                if (!this.#locked) {
+                    this.#resume();
+                }
+            });
         }
     }
 
     public wait(): Promise<void> {
         return new Promise((resolve) => {
-            if (this.#locked) {
-                this.#waiting.push(resolve);
+            if (this.#locked || this.#queue.length > 0) {
+                this.#queue.push(resolve);
             } else {
                 resolve();
             }
