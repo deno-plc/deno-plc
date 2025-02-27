@@ -21,13 +21,15 @@ import { computed } from "@deno-plc/signals";
 import { awaitSignal } from "@deno-plc/signal-utils/async";
 import { get_test_nats_client } from "./nats.test.common.ts";
 import type { MapOptions } from "../src/map.ts";
+import z from "zod";
 
 Deno.test("map transfer.fetch", async () => {
     const { client, dispose } = await get_test_nats_client();
 
-    const opt: MapOptions = {
+    const opt = {
         enable_fetching: true,
-    };
+        schema: z.number(),
+    } satisfies MapOptions;
 
     using src = client.map_source("test", opt);
     src.set("foo", 5);
@@ -42,9 +44,10 @@ Deno.test("map transfer.fetch", async () => {
 Deno.test("map transfer.update", async () => {
     const { client, dispose } = await get_test_nats_client();
 
-    const opt: MapOptions = {
+    const opt = {
         enable_fetching: false,
-    };
+        schema: z.number(),
+    } satisfies MapOptions;
 
     using src = client.map_source("test", opt);
     await using sink = client.map_sink("test", opt);
