@@ -33,4 +33,5 @@ export type { BlobSource, BlobSourceOptions } from "./src/blob.source.ts";
 export type { BlobOptions } from "./src/blob.ts";
 export type { MapSource, MapSourceOptions } from "./src/map.source.ts";
 export type { MapSink, MapSinkLike, MapSinkOptions } from "./src/map.sink.ts";
+export type { MapOptions } from "./src/map.ts";
 export { FakeBlobSink, FakeMapSink, useBlobSink, useMapSink } from "./src/hooks.ts";
