@@ -59,7 +59,7 @@ export async function init_nats(connect: () => Promise<NatsConnection>): Promise
     logger.info`connected`;
 
     for (const [key, value] of Object.entries(nc.info!)) {
-        logger.info`server ${key}: ${value}`;
+        logger.debug`server ${key}: ${value}`;
     }
 
     const client = new NatsClient(nc, nats_status);
@@ -70,8 +70,10 @@ export async function init_nats(connect: () => Promise<NatsConnection>): Promise
 
     (async () => {
         for await (const s of nc.status()) {
-            logger.info`status: ${s.type}`;
             // "error" | "disconnect" | "reconnect" | "reconnecting" | "update" | "ldm" | "ping" | "staleConnection" | "slowConsumer" | "forceReconnect"
+            if (s.type !== "ping") {
+                logger.info`status: ${s.type}`;
+            }
             switch (s.type) {
                 case "disconnect":
                     nats_status.value = NATS_Status.Disconnected;
