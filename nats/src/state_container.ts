@@ -20,6 +20,7 @@
 import { OnceLock } from "@deno-plc/utils/once_lock";
 import { type Signal, signal } from "@deno-plc/signals";
 import type { NatsClient } from "../mod.ts";
+import { assert } from "@std/assert/assert";
 
 /**
  * #[non_exhaustive]
@@ -34,25 +35,48 @@ export enum NATS_Status {
 }
 
 const client_symbol = Symbol.for("NATS_Client");
-const status_symbol = Symbol.for("NATS_Status");
+if (client_symbol in self) {
+    console.error(
+        `It looks like you are linking a version of the @deno-plc/nats crate < 0.2.0. Correct initialization of the global semaphores is not guaranteed with these versions.`,
+    );
+}
+
+const version_symbol = Symbol.for("@deno-plc/nats/semaphore-version-0.2.0");
+if (!(version_symbol in self)) {
+    Object.defineProperty(self, version_symbol, {
+        value: true,
+    });
+}
 
 export const nats_client = new OnceLock<NatsClient>();
+
+export function save_client(client: NatsClient): void {
+    assert(client_init_symbol in self);
+    const init_list = self[client_init_symbol] as Array<(client: NatsClient) => void>;
+    for (const init of init_list) {
+        init(client);
+    }
+}
+
+const client_init_symbol = Symbol.for("@deno-plc/nats/init");
+
+if (client_init_symbol in self) {
+    const init_list = self[client_init_symbol] as Array<(client: NatsClient) => void>;
+    init_list.push((client) => {
+        nats_client.init(client);
+    });
+} else {
+    Object.defineProperty(self, client_init_symbol, {
+        value: [(client: NatsClient) => {
+            nats_client.init(client);
+        }],
+    });
+}
+
+const status_symbol = Symbol.for("@deno-plc/nats/status");
 export const nats_status: Signal<NATS_Status> = status_symbol in self
     ? (self[status_symbol] as Signal<NATS_Status>)
     : signal(NATS_Status.NotConfigured);
-
-if (client_symbol in self) {
-    const pr = self[client_symbol] as Promise<NatsClient>;
-    pr.then((client) => {
-        nats_client.get_or_init(() => client);
-    });
-} else {
-    Object.defineProperty(self, client_symbol, {
-        value: (async () => {
-            await nats_client.get();
-        })(),
-    });
-}
 
 if (!(status_symbol in self)) {
     Object.defineProperty(self, status_symbol, {

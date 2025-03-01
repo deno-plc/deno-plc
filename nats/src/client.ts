@@ -198,7 +198,7 @@ export class NatsClient {
 
         if (sink.current?.[$pub_crate$_inner].subject !== subject || sink.current?.schema !== opt.schema) {
             let inner: MapSinkInner;
-            if (this[$pub_crate$_blob_subscriptions].has(subject)) {
+            if (this[$pub_crate$_map_subscriptions].has(subject)) {
                 inner = this[$pub_crate$_map_subscriptions].get(subject)!;
             } else {
                 inner = MapSinkInner[$pub_crate$_constructor](this, subject, opt);

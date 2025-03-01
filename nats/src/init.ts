@@ -18,7 +18,7 @@
  */
 
 import { assert } from "@std/assert/assert";
-import { nats_client, NATS_Status, nats_status } from "./state_container.ts";
+import { nats_client, NATS_Status, nats_status, save_client } from "./state_container.ts";
 import { logger } from "./shared.ts";
 import { NatsClient } from "./client.ts";
 import type { NatsConnection } from "@nats-io/nats-core";
@@ -64,7 +64,7 @@ export async function init_nats(connect: () => Promise<NatsConnection>): Promise
 
     const client = new NatsClient(nc, nats_status);
 
-    nats_client.init(client);
+    save_client(client);
 
     nats_status.value = NATS_Status.Connected;
 
