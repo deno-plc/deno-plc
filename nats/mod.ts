@@ -24,6 +24,10 @@ export function get_nats(): Promise<NatsClient> {
     return nats_client.get();
 }
 
+export function try_get_nats(): NatsClient | null {
+    return nats_client.try_get();
+}
+
 export { NATS_Status, nats_status } from "./src/state_container.ts";
 export { NatsClient } from "./src/client.ts";
 export { init_nats } from "./src/init.ts";
