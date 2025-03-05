@@ -46,7 +46,9 @@ export interface BlobSourceOptions {
 }
 
 export class BlobSource {
-    #registration_id = Symbol();
+    // for some reason Firefox does not like symbols as unregister tokens
+    // #registration_id = Symbol();
+    readonly #registration_id = {};
     private constructor(readonly client: NatsClient, readonly subject: string, readonly options: Required<BlobSourceOptions>) {
         dispose_registry.register(this, `subscription for ${this.subject}`, this.#registration_id);
 

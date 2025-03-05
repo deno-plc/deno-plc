@@ -346,8 +346,9 @@ export class MapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.Z
     static [$pub_crate$_constructor]<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(inner: MapSinkInner, schema: Schema): MapSink<Schema> {
         return new MapSink(inner, schema);
     }
-
-    readonly #registration_id = Symbol();
+    // for some reason Firefox does not like symbols as unregister tokens
+    // #registration_id = Symbol();
+    readonly #registration_id = {};
     #destroyed = false;
     readonly [$pub_crate$_inner]: MapSinkInner;
     readonly #validated: ValidatedValue;

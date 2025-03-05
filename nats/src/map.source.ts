@@ -65,7 +65,9 @@ export class MapSource<T extends ValueType = ValueType> {
         });
         return src;
     }
-    readonly #registration_id = Symbol();
+    // for some reason Firefox does not like symbols as unregister tokens
+    // #registration_id = Symbol();
+    readonly #registration_id = {};
 
     #fetch_subscription: Subscription | undefined;
     #periodic_update_timeout_id: number = -1;

@@ -206,7 +206,9 @@ export class BlobSink implements BlobSinkLike {
     }
 
     #destroyed = false;
-    #registration_id = Symbol();
+    // for some reason Firefox does not like symbols as unregister tokens
+    // #registration_id = Symbol();
+    readonly #registration_id = {};
     [$pub_crate$_inner]: BlobSinkInner;
 
     /**
