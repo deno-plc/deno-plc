@@ -64,9 +64,9 @@ export class UncaughtExceptionPanic extends Panic {
 }
 
 addEventListener("error", (ev) => {
-    panic_store.set(`CLIENT_MAIN_THREAD_UNCAUGHT_EXCEPTION+${panic_counter}`, new UncaughtExceptionPanic(ev.error));
+    panic_store.set(`CLIENT_MAIN_THREAD_UNCAUGHT_EXCEPTION+${panic_counter}`, new UncaughtExceptionPanic(ev.error ?? ev));
     panic_counter++;
-    panic_logger_no_console.fatal`Uncaught exception: ${ev.error}`;
+    panic_logger.fatal`Uncaught exception: ${ev}`;
 });
 
 export class UnhandledRejectionPanic extends Panic {
