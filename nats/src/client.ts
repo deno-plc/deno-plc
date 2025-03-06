@@ -130,8 +130,9 @@ export class NatsClient {
         // always sync hooks with placeholders in hooks.ts !!
         const sink = useRef<BlobSink | null>(null);
         useEffect(() => () => {
-            sink.current?.[Symbol.dispose]?.();
+            sink.current?.dispose();
         }, [true]);
+
         if (sink.current?.[$pub_crate$_inner].subject !== subject) {
             let inner: BlobSinkInner;
             if (this[$pub_crate$_blob_subscriptions].has(subject)) {
@@ -140,7 +141,7 @@ export class NatsClient {
                 inner = BlobSinkInner[$pub_crate$_constructor](this, subject, opt);
                 this[$pub_crate$_blob_subscriptions].set(subject, inner);
             }
-            sink.current?.[Symbol.dispose]?.();
+            sink.current?.dispose();
             sink.current = BlobSink[$pub_crate$_constructor](inner);
         }
         return sink.current;
@@ -193,7 +194,7 @@ export class NatsClient {
         // always sync hooks with placeholders in hooks.ts !!
         const sink = useRef<MapSink<Schema> | null>(null);
         useEffect(() => () => {
-            sink.current?.[Symbol.dispose]?.();
+            sink.current?.dispose();
         }, [true]);
 
         if (sink.current?.[$pub_crate$_inner].subject !== subject || sink.current?.schema !== opt.schema) {
@@ -204,7 +205,7 @@ export class NatsClient {
                 inner = MapSinkInner[$pub_crate$_constructor](this, subject, opt);
                 this[$pub_crate$_map_subscriptions].set(subject, inner);
             }
-            sink.current?.[Symbol.dispose]?.();
+            sink.current?.dispose();
             sink.current = MapSink[$pub_crate$_constructor](inner, opt.schema);
         }
         return sink.current;

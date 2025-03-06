@@ -1,6 +1,6 @@
 {
     "name": "@deno-plc/ui",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "exports": {
         "./errors": "./src/errors/mod.ts",
         "./icons-ms": "./src/icons/Ms.tsx",

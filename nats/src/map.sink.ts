@@ -326,13 +326,11 @@ export class MapSinkInner {
     }
 }
 
-export interface MapSinkLike<T> {
+export interface MapSinkLike<T> extends AsyncDisposable {
     readonly value: MapSignal<string, T | null>;
     readonly raw_value: MapSignal<string, ValueType>;
     readonly valid: boolean;
 
-    [Symbol.asyncDispose](): Promise<void>;
-    [Symbol.dispose](): void;
     dispose(): Promise<void>;
 }
 
@@ -385,10 +383,6 @@ export class MapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.Z
         await wait(100);
         this[$pub_crate$_inner].detach(this.schema);
         this[$pub_crate$_inner].try_dispose();
-    }
-
-    [Symbol.dispose]() {
-        this[Symbol.asyncDispose]();
     }
 
     async dispose() {

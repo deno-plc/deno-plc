@@ -184,14 +184,12 @@ export class BlobSinkInner {
     }
 }
 
-export interface BlobSinkLike {
+export interface BlobSinkLike extends AsyncDisposable {
     readonly value: Uint8Array;
     peek(): Uint8Array;
     readonly valid: boolean;
 
     dispose(): Promise<void>;
-    [Symbol.asyncDispose](): Promise<void>;
-    [Symbol.dispose](): void;
 }
 
 export class BlobSink implements BlobSinkLike {
@@ -239,10 +237,6 @@ export class BlobSink implements BlobSinkLike {
         // in hooks the old values are dropped first, so we need to wait a bit in case the subscription is used again
         await wait(100);
         this[$pub_crate$_inner].try_dispose();
-    }
-
-    [Symbol.dispose]() {
-        this[Symbol.asyncDispose]();
     }
 
     async dispose() {

@@ -47,7 +47,6 @@ export class FakeBlobSink implements BlobSinkLike {
     }
 
     async [Symbol.asyncDispose]() {}
-    [Symbol.dispose]() {}
     async dispose() {}
 }
 
@@ -82,7 +81,6 @@ export class FakeMapSink<T> implements MapSinkLike<T> {
     }
 
     async [Symbol.asyncDispose]() {}
-    [Symbol.dispose]() {}
     async dispose() {}
 }
 
