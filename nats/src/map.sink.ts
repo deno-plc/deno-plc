@@ -308,9 +308,6 @@ export class MapSinkInner {
         }
 
         value.instances--;
-        if (value.instances === 0) {
-            value.value.clear();
-        }
     }
 
     try_dispose() {
