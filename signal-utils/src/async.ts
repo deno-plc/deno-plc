@@ -54,6 +54,7 @@ import { effect, type Signal } from "@deno-plc/signals";
  * If you need a custom comparison function use {@link awaitMatch}
  */
 export function awaitSignal<T>(signal: Signal<T>, value: T): Promise<true>;
+export function awaitSignal<T>(signal: Signal<T>, value: T, timeout: number): Promise<boolean>;
 export function awaitSignal<T>(
     signal: Signal<T>,
     value: T,
@@ -92,6 +93,11 @@ export function awaitMatch<T>(
     signal: Signal<T>,
     match: ($: T) => boolean,
 ): Promise<true>;
+export function awaitMatch<T>(
+    signal: Signal<T>,
+    match: ($: T) => boolean,
+    timeout: number,
+): Promise<boolean>;
 export function awaitMatch<T>(
     signal: Signal<T>,
     match: ($: T) => boolean,
