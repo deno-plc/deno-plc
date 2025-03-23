@@ -20,7 +20,12 @@
 import { Lock } from "./lock.ts";
 import { assertEquals } from "@std/assert/equals";
 
-Deno.test("Lock", async () => {
+const wait_time = () =>
+    new Promise((resolve) => {
+        setTimeout(resolve, 0);
+    });
+
+Deno.test("Simple Lock", async () => {
     const lock = new Lock(false);
     let order = 0;
 
@@ -30,7 +35,7 @@ Deno.test("Lock", async () => {
     };
 
     assertOrder(0);
-    await lock.wait();
+    await lock.wait(); // should not block
     assertOrder(1);
     lock.lock();
     assertOrder(2);
@@ -43,11 +48,16 @@ Deno.test("Lock", async () => {
 
     assertOrder(4);
     lock.unlock();
-    assertOrder(5);
-    await lock.wait();
+    assertOrder(5); // promises are always run using queueMicrotask
+    await wait_time(); // next event loop tick
     assertOrder(7);
+    await lock.wait(); // should not block
+    assertOrder(8);
 });
 
+/**
+ * Test the lock ordering when the lock is locked immediately after waiting for it to unlock.
+ */
 Deno.test("Lock ordering", async () => {
     const lock = new Lock(false);
     let order = 0;
@@ -57,30 +67,25 @@ Deno.test("Lock ordering", async () => {
         order++;
     };
 
-    const wait_time = () =>
-        new Promise((resolve) => {
-            setTimeout(resolve, 10);
-        });
-
     assertOrder(0);
-    await lock.wait();
+    await lock.wait(); // should not block
     assertOrder(1);
     lock.lock();
     assertOrder(2);
 
     (async () => {
         assertOrder(3);
-        await lock.wait();
+        await lock.wait(); // this is registered first
         assertOrder(7);
-        lock.lock();
+        lock.lock(); // immediately lock again
         await wait_time();
         lock.unlock();
-        assertOrder(8);
+        assertOrder(8); // the second block will be run in the next microtask
     })();
 
     (async () => {
         assertOrder(4);
-        await lock.wait();
+        await lock.wait(); // this is registered second
         assertOrder(9);
         lock.lock();
         await wait_time();

@@ -17,6 +17,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * A lock that can be used to synchronize async operations.
+ *
+ * Can be used to queue operations that should not run concurrently.
+ *
+ * To fully understand the exact behavior, have a look at the test cases:
+ * https://github.com/deno-plc/deno-plc/blob/main/utils/src/lock.test.ts
+ */
 export class Lock {
     public constructor(initial_locked: boolean) {
         this.#locked = initial_locked;
@@ -24,6 +32,9 @@ export class Lock {
     #locked: boolean;
     #queue: (() => void)[] = [];
 
+    /**
+     * lock() or lock(true) will lock the lock, lock(false) will unlock it.
+     */
     public lock(lock: boolean = true) {
         if (lock) {
             this.#locked = true;
@@ -32,6 +43,9 @@ export class Lock {
         }
     }
 
+    /**
+     * unlock the lock
+     */
     public unlock() {
         this.#locked = false;
         this.#resume();
@@ -49,6 +63,9 @@ export class Lock {
         }
     }
 
+    /**
+     * @returns a promise that resolves when the lock is unlocked
+     */
     public wait(): Promise<void> {
         return new Promise((resolve) => {
             if (this.#locked || this.#queue.length > 0) {
@@ -59,10 +76,16 @@ export class Lock {
         });
     }
 
+    /**
+     * @returns true if the lock is locked
+     */
     public get locked(): boolean {
         return this.#locked;
     }
 
+    /**
+     * set the lock state
+     */
     public set locked(locked: boolean) {
         this.lock(locked);
     }

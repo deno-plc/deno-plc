@@ -20,10 +20,16 @@
 import { decodeHex, encodeHex } from "@std/encoding/hex";
 import { assertStrictEquals } from "@std/assert/strict-equals";
 
+/**
+ * converts a UUID to its binary representation. Produces incorrect results if the input is not a valid UUID.
+ */
 export function uuidToBinary(uuid: string): Uint8Array {
     return decodeHex(uuid.replaceAll("-", ""));
 }
 
+/**
+ * parses a UUID from its binary representation.
+ */
 export function binaryToUuid(bin: Uint8Array): string {
     const hex = encodeHex(bin);
     assertStrictEquals(hex.length, 32);

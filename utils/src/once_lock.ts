@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,9 @@
  */
 
 const Uninitialized = Symbol("Uninitialized");
-
+/**
+ * Utility for storing global instances
+ */
 export class OnceLock<T> {
     constructor() {
         this.#pr = new Promise((resolve) => {
@@ -29,10 +31,16 @@ export class OnceLock<T> {
     readonly #pr: Promise<T>;
     #resolve: (value: T) => void = () => {};
 
+    /**
+     * Returns true if the OnceLock is initialized
+     */
     public get initialized(): boolean {
         return this.#value !== Uninitialized;
     }
 
+    /**
+     * @returns the value if it is initialized, otherwise null
+     */
     public try_get(): T | null {
         if (this.#value === Uninitialized) {
             return null;
@@ -41,6 +49,9 @@ export class OnceLock<T> {
         }
     }
 
+    /**
+     * @returns a Promise that resolves to the value once it is initialized or immediately if it is already initialized
+     */
     public get(): Promise<T> {
         if (this.#value === Uninitialized) {
             return this.#pr;
@@ -49,6 +60,9 @@ export class OnceLock<T> {
         }
     }
 
+    /**
+     * @returns the value if it is initialized, otherwise initializes it with the return value of the given function and returns it
+     */
     public get_or_init(init: () => T): T {
         if (this.#value === Uninitialized) {
             const value = init();
@@ -60,6 +74,9 @@ export class OnceLock<T> {
         }
     }
 
+    /**
+     * Initializes the OnceLock with the given value. Throws an error if the OnceLock is already initialized.
+     */
     public init(value: T) {
         if (this.#value === Uninitialized) {
             this.#value = value;

@@ -17,6 +17,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @module nightly
+ *
+ * The nightly module helps shipping experimental features to users but
+ * not enabling them by default. It can be used as a general purpose
+ * settings system too.
+ *
+ * It provides some abstraction, for browsers there is LocalStorageNightly,
+ * for servers you would use a configuration file or CLI flags.
+ */
+
 import { getLogger } from "@logtape/logtape";
 import { z } from "zod";
 import { computed, type ReadonlySignal, type Signal, signal } from "@deno-plc/signals";
@@ -27,8 +38,14 @@ const logger = getLogger(["app", "nightly"]);
 const NIGHTLY_SYMBOL = Symbol.for("@deno-plc/utils/nightly/SYMBOL:NIGHTLY");
 const NIGHTLY_INITIALIZED_SYMBOL = Symbol.for("@deno-plc/utils/nightly/SYMBOL:NIGHTLY-INITIALIZED");
 
+/**
+ * The value of a nightly flag can be a string, boolean, number or null (default value).
+ */
 export type NightlyValue = string | boolean | number | null;
 
+/**
+ * Abstraction for a nightly flags provider.
+ */
 export class Nightly {
     constructor(readonly options: Map<string, NightlyValue>) {
         if (this.options.size > 0) {
@@ -68,6 +85,9 @@ self[NIGHTLY_INITIALIZED_SYMBOL] = () => {
     }
 };
 
+/**
+ * sets a provider as global nightly provider
+ */
 export function init_nightly(provider: Nightly) {
     // @ts-ignore globals
     if (self[NIGHTLY_SYMBOL]) {
@@ -83,6 +103,11 @@ export function init_nightly(provider: Nightly) {
 const Storage = z.record(z.union([z.string(), z.boolean(), z.number(), z.null()]));
 type Storage = z.infer<typeof Storage>;
 
+/**
+ * Nightly provider for use in browsers that uses localStorage to store the flags.
+ *
+ * A convenient editor UI is available in @deno-plc/ui
+ */
 export class LocalStorageNightly extends Nightly {
     constructor() {
         const config = localStorage.getItem("nightly");
@@ -138,6 +163,9 @@ export class LocalStorageNightly extends Nightly {
 
     preview_options: Map<string, NightlyValue> = new Map(this.options);
 
+    /**
+     * In contrast to other providers this allows editing the flags.
+     */
     update(id: string, value: NightlyValue) {
         this.preview_options.set(id, value);
         localStorage.setItem("nightly", JSON.stringify(Object.fromEntries(this.preview_options)));
@@ -146,6 +174,9 @@ export class LocalStorageNightly extends Nightly {
     }
 }
 
+/**
+ * Wait for the nightly provider to be initialized and return the value of a nightly flag.
+ */
 export async function wait_nightly(id: string): Promise<NightlyValue> {
     // @ts-ignore globals
     if (!self[NIGHTLY_SYMBOL]) {
@@ -155,6 +186,9 @@ export async function wait_nightly(id: string): Promise<NightlyValue> {
     return (self[NIGHTLY_SYMBOL] as Nightly).get(id);
 }
 
+/**
+ * Wait for the nightly provider to be initialized and return the provider.
+ */
 export async function wait_nightly_provider(): Promise<Nightly> {
     // @ts-ignore globals
     if (!self[NIGHTLY_SYMBOL]) {
@@ -164,15 +198,9 @@ export async function wait_nightly_provider(): Promise<Nightly> {
     return self[NIGHTLY_SYMBOL];
 }
 
-export function get_nightly_provider(): Nightly | null {
-    // @ts-ignore globals
-    if (!self[NIGHTLY_SYMBOL]) {
-        return null;
-    }
-    // @ts-ignore globals
-    return self[NIGHTLY_SYMBOL];
-}
-
+/**
+ * Get the value of a nightly flag or null if not initialized.
+ */
 export function get_nightly(id: string): NightlyValue {
     // @ts-ignore globals
     if (!self[NIGHTLY_SYMBOL]) {
@@ -180,4 +208,16 @@ export function get_nightly(id: string): NightlyValue {
     }
     // @ts-ignore globals
     return (self[NIGHTLY_SYMBOL] as Nightly).get(id);
+}
+
+/**
+ * Get the nightly provider or null if not initialized.
+ */
+export function get_nightly_provider(): Nightly | null {
+    // @ts-ignore globals
+    if (!self[NIGHTLY_SYMBOL]) {
+        return null;
+    }
+    // @ts-ignore globals
+    return self[NIGHTLY_SYMBOL];
 }

@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2024 Hans Schallmoser
+ * Copyright (C) 2024 - 2025 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export function promiseTimeout<T, D>(promise: Promise<T>, timeout: number, def: D): Promise<T | D> {
+/**
+ * adds a timeout to a promise
+ * @returns a promise that resolves to the value of the input promise or the default value if the input promise does not resolve within the timeout
+ */
+export function promiseTimeout<T, D>(promise: Promise<T>, timeout: number, default_value: D): Promise<T | D> {
     return new Promise((resolve) => {
         let resolved = false;
         promise.then((val) => {
@@ -29,7 +33,7 @@ export function promiseTimeout<T, D>(promise: Promise<T>, timeout: number, def: 
         setTimeout(() => {
             if (!resolved) {
                 resolved = true;
-                resolve(def);
+                resolve(default_value);
             }
         }, timeout);
     });

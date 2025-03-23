@@ -19,21 +19,36 @@
 
 import { Vec2 } from "./vec2.ts";
 
+/**
+ * Represents an immutable rectangle
+ */
 export class Rect {
     constructor(readonly x: number, readonly y: number, readonly w: number, readonly h: number) {}
 
+    /**
+     * @returns a rectangle with a size and position of 0
+     */
     public static null(): Rect {
         return new Rect(0, 0, 0, 0);
     }
 
+    /**
+     * @returns a rectangle with the same position, but a size of 0
+     */
     public to_null(): Rect {
         return new Rect(this.x, this.y, 0, 0);
     }
 
+    /**
+     * constructs a rectangle from a base position and a size
+     */
     public static from_base_size(base: Vec2, size: Vec2): Rect {
         return new Rect(base.x, base.y, size.x, size.y);
     }
 
+    /**
+     * constructs a rectangle from a start and end position
+     */
     public static from_start_end(start: Vec2, end: Vec2): Rect {
         const x = Math.min(start.x, end.x);
         const y = Math.min(start.y, end.y);
@@ -42,30 +57,56 @@ export class Rect {
         return new Rect(x, y, w, h);
     }
 
+    /**
+     * In some cases like dealing with a grid, it is useful to have
+     * a rectangle that is one unit larger than the original
+     *
+     * Sometimes the start and end position of a rectangle are
+     * the same and the rectangle would have a size of 0, but it
+     * shall have a size of 1
+     */
     public fill_end(unit: number = 1): Rect {
         return new Rect(this.x, this.y, this.w + unit, this.h + unit);
     }
 
+    /**
+     * @returns the base position (usually the top-left corner) of the rectangle
+     */
     public get_base(): Vec2 {
         return new Vec2(this.x, this.y);
     }
 
+    /**
+     * @returns the size of the rectangle
+     */
     public get_size(): Vec2 {
         return new Vec2(this.w, this.h);
     }
 
+    /**
+     * @returns the end position (usually the bottom-right corner) of the rectangle
+     */
     public get_end(): Vec2 {
         return new Vec2(this.x + this.w, this.y + this.h);
     }
 
+    /**
+     * translates the rectangle by a vector
+     */
     public add(v: Vec2): Rect {
         return new Rect(this.x + v.x, this.y + v.y, this.w, this.h);
     }
 
+    /**
+     * translates the rectangle by the negative of a vector
+     */
     public sub(v: Vec2): Rect {
         return new Rect(this.x - v.x, this.y - v.y, this.w, this.h);
     }
 
+    /**
+     * compares two rectangles for equality
+     */
     public eq(v: Rect): boolean {
         return this.x === v.x && this.y === v.y && this.w === v.w && this.h === v.h;
     }

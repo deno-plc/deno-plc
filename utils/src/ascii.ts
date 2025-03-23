@@ -17,7 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Commonly used ASCII values.
+ */
 export enum ASCII {
+    Bull = 0x00,
     Newline = 0x0a,
     Return = 0x0d,
     Space = 0x20,

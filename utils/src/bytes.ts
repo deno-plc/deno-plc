@@ -17,6 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * compare two Uint8Arrays for equality
+ */
 export function byteEquals(a: Uint8Array, b: Uint8Array): boolean {
     if (a.length !== b.length) {
         return false;
@@ -31,6 +34,9 @@ export function byteEquals(a: Uint8Array, b: Uint8Array): boolean {
     return true;
 }
 
+/**
+ * compare two Uint32Arrays for equality (around 2x faster than byteEquals)
+ */
 export function byteEqualsU32(a: Uint32Array, b: Uint32Array): boolean {
     if (a.length !== b.length) {
         return false;

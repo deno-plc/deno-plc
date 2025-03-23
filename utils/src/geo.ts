@@ -20,6 +20,9 @@
 import { Rect } from "./rect.ts";
 import { Vec2 } from "./vec2.ts";
 
+/**
+ * calculate the position of a context menu (for @deno-plc/workbench)
+ */
 export function contextMenuPosition(area_size: Vec2, base: Rect, min_size: Vec2): Rect {
     const menu_size = new Vec2(Math.min(area_size.x, Math.max(min_size.x, base.w)), Math.min(area_size.y, Math.max(min_size.y, base.h)));
 

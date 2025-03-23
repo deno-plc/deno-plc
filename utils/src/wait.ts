@@ -17,6 +17,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * @returns a promise that resolves after a given time
+ */
 export function wait(time: number, abort?: AbortSignal): Promise<void> {
     return new Promise<void>((resolve) => {
         let resolved = false;

@@ -17,29 +17,50 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Represents an immutable 2D vector
+ */
 export class Vec2 {
     constructor(public x: number, public y: number) {}
 
+    /**
+     * @returns a vector with a value of 0
+     */
     public static null(): Vec2 {
         return new Vec2(0, 0);
     }
 
+    /**
+     * adds another vector to this vector and returns the result
+     */
     public add(v: Vec2): Vec2 {
         return new Vec2(this.x + v.x, this.y + v.y);
     }
 
+    /**
+     * subtracts another vector from this vector and returns the result
+     */
     public sub(v: Vec2): Vec2 {
         return new Vec2(this.x - v.x, this.y - v.y);
     }
 
+    /**
+     * compares this vector to another vector for equality
+     */
     public eq(v: Vec2): boolean {
         return this.x === v.x && this.y === v.y;
     }
 
+    /**
+     * @returns the component-wise minimum of this vector and another vector
+     */
     public min(v: Vec2): Vec2 {
         return new Vec2(Math.min(this.x, v.x), Math.min(this.y, v.y));
     }
 
+    /**
+     * @returns the component-wise maximum of this vector and another vector
+     */
     public max(v: Vec2): Vec2 {
         return new Vec2(Math.max(this.x, v.x), Math.max(this.y, v.y));
     }
