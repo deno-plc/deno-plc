@@ -49,13 +49,12 @@ interface UAData {
     getHighEntropyValues(hints: (keyof HighEntropyValues)[]): Promise<HighEntropyValues>;
 }
 
-const MORE_INFO_LABEL = "More Info";
+const MORE_INFO_LABEL = "More Info [High entropy values]";
 
 export function Bsod(p: {
     children?: ComponentChildren;
     errorcode: string;
     additional_context?: [ComponentChildren, ComponentChildren][];
-    // stack?: string,
 }): VNode {
     const ssr_ctx = useSSRContext();
     const system_info = useMemo(() => new MapSignal<string, string>(), []);
@@ -77,7 +76,6 @@ export function Bsod(p: {
             });
 
             uaData.getHighEntropyValues(["architecture", "bitness", "fullVersionList", "platformVersion", "formFactor", "model"]).then((values) => {
-                console.log(values);
                 batch(() => {
                     system_info.delete(MORE_INFO_LABEL);
                     if (values.bitness) {
@@ -94,9 +92,20 @@ export function Bsod(p: {
                             system_info.set(`${brand} Version`, `${version}`);
                         }
                     }
-                    if (values.platformVersion) {
-                        const platformVersion = values.platformVersion === "15.0.0" && uaData.platform === "Windows" ? "11" : values.platformVersion;
-                        system_info.set("OS", `${uaData.platform} ${platformVersion}`);
+                    if (values.platformVersion && uaData.platform) {
+                        if (uaData.platform === "Windows") {
+                            system_info.set("Windows Universal Platform API Version", values.platformVersion);
+                            const platformMajor = Number(values.platformVersion.split(".")[0]);
+                            if (platformMajor === 0) {
+                                system_info.set("OS", `Windows 7/8/8.1`);
+                            } else if (platformMajor < 10) {
+                                system_info.set("OS", `Windows 10`);
+                            } else if (platformMajor >= 13) {
+                                system_info.set("OS", `Windows 11`);
+                            }
+                        } else {
+                            system_info.set("OS", `${uaData.platform} ${values.platformVersion}`);
+                        }
                     }
                     if (values.formFactor) {
                         system_info.set("Form factor", values.formFactor);
@@ -141,7 +150,7 @@ export function Bsod(p: {
                             {navigator?.userAgent ?? "<Unknown>"}
                         </span>
                     </div>
-                    {[...system_info.entries(), ...p.additional_context ?? []]?.map(([id, value]) => (
+                    {[...p.additional_context ?? [], ...system_info.entries()]?.map(([id, value]) => (
                         <div>
                             {id}:{" "}
                             <span class={`font-mono text-xl`}>
