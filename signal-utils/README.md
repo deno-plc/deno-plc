@@ -1,12 +1,10 @@
-# [@Deno-PLC](https://github.com/deno-plc) / [signal-utils](https://jsr.io/@deno-plc/signal-utils)
+# [`@deno-plc/signal-utils` ![JSR](https://jsr.io/badges/@deno-plc/signal-utils)](https://jsr.io/@deno-plc/signal-utils)
+
+Note: This uses the [@deno-plc/signals wrapper](../signals/README.md)
 
 Small and easy to use utilities for [Preact Signals](https://preactjs.com/guide/v10/signals)
 
 They simplify usage [in async code](#awaitsignalawaitmatch), [with Sets and Maps](#setsignalmapsignal) and [as timers](#timersignal)
-
-## Installation
-
-[Use JSR: ![JSR](https://jsr.io/badges/@deno-plc/signal-utils)](https://jsr.io/@deno-plc/signal-utils)
 
 ## Usage
 
@@ -17,7 +15,7 @@ More usage examples can be found [here](https://github.com/deno-plc/deno-plc/tre
 Listen to Signal changes with async/await
 
 ```typescript
-import { signal } from "@preact/signals-core";
+import { signal } from "@deno-plc/signals";
 import { awaitSignal } from "@deno-plc/signal-utils/async";
 
 const connected = signal(false);
@@ -39,15 +37,15 @@ resolves with `true` if the values matched and `false` if the timeout was reache
 
 ### `SetSignal`/`MapSignal`
 
-Both can be used like ordinary Sets/Maps (they even implement the interfaces provided by the TS DOM lib). Only advanced
-[composition functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set#set_composition) are not supported (they
-would get extremely complex)
+Both can be used like ordinary Sets/Maps. Only
+[advanced composition functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set#set_composition) are not
+supported (they would get extremely complex)
 
 In contrast to ordinary Maps/Sets they track all member changes. Unless otherwise noted all methods work like `.value` on a signal. Getter functions
 like `.has()`, `.get()` or `.size` have mirrors prefixed with `peek_` behaving like `.peek()` on a signal
 
 ```typescript
-import { effect } from "@preact/signals-core";
+import { effect } from "@deno-plc/signals";
 import { SetSignal } from "@deno-plc/signal-utils/set";
 
 const list = new SetSignal();
@@ -73,7 +71,7 @@ A `TimerSignal` is essentially a `boolean` signal that defaults to `false`. It c
 released (either the timeout elapsed or it was canceled) it resets to `false`.
 
 ```typescript
-import { effect } from "@preact/signals-core";
+import { effect } from "@deno-plc/signals";
 import { TimerSignal } from "@deno-plc/signal-utils/timer";
 
 const timer = new TimerSignal();
@@ -102,15 +100,3 @@ Cancels the given activation
 ### `TimerSignal`.`clear`()
 
 Cancels all activations
-
-## License (GPL-3.0-or-later)
-
-(C) 2024 Hans Schallmoser
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free
-Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses/.
