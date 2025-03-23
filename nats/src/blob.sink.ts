@@ -126,7 +126,11 @@ export class BlobSinkInner {
                 this.value.value = view;
                 this.valid.value = true;
             } catch (err) {
-                logger.error`error fetching blob ${this.subject}: ${err}`;
+                this.valid.value = false;
+                const err_ = err as Error;
+                if (err_.name !== "RequestError" || !String(err_.cause).startsWith("NoResponders")) {
+                    logger.error`error fetching blob ${this.subject}: ${err}`;
+                }
             }
 
             await this.#retry.wait(this.destroy_abort.signal);

@@ -96,6 +96,9 @@
         "jsr:@std/assert@~0.225.2",
         "jsr:@std/path@~0.225.1",
         "jsr:@std/semver@^1.0.2",
+        "npm:acorn-walk@^8.3.3",
+        "npm:acorn@^8.12.1",
+        "npm:lebab@^3.2.4",
         "npm:resolve.exports@^2.0.2",
         "npm:validate-npm-package-name@^5.0.1",
         "npm:zod@^3.22.5"
