@@ -39,7 +39,7 @@ export function NATSStatus(): VNode {
             <Notif
                 type={NotifType.Progress}
                 title="Connecting to NATS server"
-                active={nats_status.value === NATS_Status.Connecting}
+                active={nats_status.value === NATS_Status.Connecting || nats_status.value === NATS_Status.Reconnecting}
             >
                 <div class={`rounded-full bg-stone-800 w-full h-2 relative my-3 overflow-hidden flex flex-row`}>
                     <div
