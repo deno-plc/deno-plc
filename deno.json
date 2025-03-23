@@ -15,7 +15,8 @@
         "check:license": "deno run --allow-read --allow-write --allow-run=git scripts/license-bot.ts",
         "check:spell": "deno run -A npm:cspell@^8.14.2 lint .",
         "check:test": "deno test -A",
-        "dev": "deno run -A frontend/src/dev.ts"
+        "dev": "deno run -A frontend/src/dev.ts",
+        "merge-release": "git checkout release && git merge main && git push && git checkout main"
     },
     "imports": {
         "@coderspirit/nominal": "npm:@coderspirit/nominal@^4.1.1",
