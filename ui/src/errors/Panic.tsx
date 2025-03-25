@@ -99,8 +99,11 @@ export function wasm_panic(err: string) {
 
 export function GlobalPanic(p: {
     children?: ComponentChildren;
+    context_isolation?: boolean;
+    secure_context?: boolean;
 }): VNode {
-    const isSecureContext = self.isSecureContext ||
+    const isSecureContext = p.secure_context === false ||
+        self.isSecureContext ||
         new URL(location.href).searchParams.has("treat-as-secure-context") ||
         "Deno" in self;
 
@@ -126,7 +129,7 @@ export function GlobalPanic(p: {
          * Try loading the application via HTTPS (and accept the self-signed certificate) or use the `--unsafely-treat-insecure-origin-as-secure` browser flag
          */
         return <Bsod errorcode="INSECURE_BROWSING_CONTEXT"></Bsod>;
-    } else if (!isContextIsolated) {
+    } else if (!isContextIsolated && p.context_isolation) {
         /**
          * This application depends on APIs that are for security reasons only available if advanced context isolation is enabled
          *
