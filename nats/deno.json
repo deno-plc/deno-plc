@@ -1,6 +1,6 @@
 {
     "name": "@deno-plc/nats",
-    "version": "0.3.3",
+    "version": "0.3.4",
     "exports": "./mod.ts",
     "imports": {
         "@std/msgpack": "jsr:@std/msgpack@^1.0.3"

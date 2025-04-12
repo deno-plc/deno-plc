@@ -6,11 +6,11 @@
     "jsr:@logtape/logtape@0.8": "0.8.2",
     "jsr:@logtape/logtape@~0.8.2": "0.8.2",
     "jsr:@luca/cases@1": "1.0.0",
-    "jsr:@nats-io/nats-core@^3.0.0-48": "3.0.0-51",
+    "jsr:@nats-io/nats-core@^3.0.2": "3.0.2",
+    "jsr:@nats-io/nkeys@2.0.3": "2.0.3",
     "jsr:@nats-io/nkeys@~2.0.0-3": "2.0.0",
-    "jsr:@nats-io/nkeys@~2.0.2": "2.0.2",
     "jsr:@nats-io/nuid@2.0.1-2": "2.0.1-2",
-    "jsr:@nats-io/nuid@~2.0.3": "2.0.3",
+    "jsr:@nats-io/nuid@2.0.3": "2.0.3",
     "jsr:@std/assert@0.223": "0.223.0",
     "jsr:@std/assert@0.226": "0.226.0",
     "jsr:@std/assert@^1.0.9": "1.0.11",
@@ -126,11 +126,11 @@
         "jsr:@nats-io/nuid@2.0.1-2"
       ]
     },
-    "@nats-io/nats-core@3.0.0-51": {
-      "integrity": "6840ade55dbd7453f365134a7efcbfe0ab3ec990ece3a33748875c259d7dc9f2",
+    "@nats-io/nats-core@3.0.2": {
+      "integrity": "e38944d564ea50d5c50f2d8d47f16cead1872d16b12e76ece64933d87a65176b",
       "dependencies": [
-        "jsr:@nats-io/nkeys@~2.0.2",
-        "jsr:@nats-io/nuid@~2.0.3"
+        "jsr:@nats-io/nkeys@2.0.3",
+        "jsr:@nats-io/nuid@2.0.3"
       ]
     },
     "@nats-io/nkeys@2.0.0": {
@@ -139,8 +139,8 @@
         "npm:tweetnacl"
       ]
     },
-    "@nats-io/nkeys@2.0.2": {
-      "integrity": "7d61c7da8892988d5711424c4aa39ba37300373a58de4735cb92249a63b6cf0f",
+    "@nats-io/nkeys@2.0.3": {
+      "integrity": "e92c96eea32b559f2e0f32555b49376942d66c07e59efff9180dbf29e516fbd8",
       "dependencies": [
         "npm:tweetnacl"
       ]
@@ -1857,7 +1857,7 @@
       "jsr:@hono/hono@^4.6.14",
       "jsr:@logtape/logtape@0.8",
       "jsr:@luca/cases@1",
-      "jsr:@nats-io/nats-core@^3.0.0-48",
+      "jsr:@nats-io/nats-core@^3.0.2",
       "jsr:@std/assert@^1.0.9",
       "jsr:@std/cli@^1.0.9",
       "jsr:@std/encoding@^1.0.5",
