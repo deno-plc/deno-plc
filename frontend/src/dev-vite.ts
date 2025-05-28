@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC HMI
  *
- * Copyright (C) 2024 - 2025 Hans Schallmoser
+ * Copyright (C) 2024 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { createServer } from "vite";
+import { config } from "./vite.ts";
+// import { app } from "../src/server/server.ts";
+import { Lock } from "https://deno.land/x/simple_promise_lock@v2.2.1/deno/lock.ts";
 import { render } from "preact-render-to-string";
 import { StatusCode } from "hono/utils/http-status";
 import { DevSSR } from "./dev.ssr.tsx";
@@ -24,10 +28,6 @@ import { serveFile } from "@std/http";
 import { getPath } from "./material-icons.ssr.ts";
 import { Hono } from "hono";
 import { configure, getConsoleSink } from "@logtape/logtape";
-import { dev_server } from "@deno-plc/build";
-import { assertLessOrEqual } from "@std/assert/less-or-equal";
-import { join } from "@std/path/join";
-import { toFileUrl } from "@std/path/to-file-url";
 
 await configure({
     sinks: {
@@ -40,6 +40,11 @@ await configure({
             sinks: ["console"],
         },
         {
+            category: "vite-plugin-deno",
+            lowestLevel: "info",
+            sinks: ["console"],
+        },
+        {
             category: ["logtape", "meta"],
             lowestLevel: "warning",
             sinks: ["console"],
@@ -48,7 +53,24 @@ await configure({
     reset: true,
 });
 
+const vite_cfg = config({
+    env: "browser",
+});
+
+const vite_server = createServer(vite_cfg);
+vite_server.then((vite) => {
+    vite.listen().then(() => {
+        console.log("%c[vite] ready", "color: green");
+    });
+});
+
 const app = new Hono();
+
+app.use((c, next) => {
+    c.header("Cross-Origin-Opener-Policy", "same-origin");
+    c.header("Cross-Origin-Embedder-Policy", "credentialless");
+    return next();
+});
 
 app.get("/dev-assets/tailwind-play", async (c) => {
     const play_code = await Deno.readTextFile("./frontend/src/style/play.tailwind.js.bin");
@@ -61,63 +83,100 @@ app.get("/dev-assets/material-symbols/:fam", async (c) => {
     return serveFile(c.req.raw, path);
 });
 
-app.get("/@module/filesink.node.ts", (c) => {
-    return c.text("", 200, {
-        "Content-Type": "text/javascript;charset=UTF-8",
-        "Cache-Control": "no-store",
-    });
+app.all("/", async (c) => {
+    const websocketProtocol = c.req.header("sec-websocket-protocol");
+    if (
+        c.req.header("Upgrade")?.toLowerCase() === "websocket" &&
+        websocketProtocol?.startsWith("vite-")
+    ) {
+        const { response, socket: downstream } = Deno.upgradeWebSocket(
+            c.req.raw,
+            {
+                protocol: websocketProtocol,
+            },
+        );
+
+        const upstream = new WebSocket("ws://[::1]:81/", websocketProtocol);
+
+        const upstreamReady = Lock(true);
+        const downstreamReady = Lock(true);
+
+        upstream.addEventListener("message", async (ev) => {
+            await downstreamReady();
+            if (downstream.readyState === WebSocket.OPEN) {
+                downstream.send(ev.data);
+            }
+        });
+
+        upstream.addEventListener("open", () => {
+            upstreamReady.unlock();
+        });
+
+        upstream.addEventListener("close", () => {
+            if (downstream.readyState === WebSocket.OPEN) {
+                downstream.close();
+            }
+        });
+
+        downstream.addEventListener("message", async (ev) => {
+            await upstreamReady();
+            if (upstream.readyState === WebSocket.OPEN) {
+                upstream.send(ev.data);
+            }
+        });
+
+        downstream.addEventListener("open", () => {
+            downstreamReady.unlock();
+        });
+
+        downstream.addEventListener("close", () => {
+            if (upstream.readyState === WebSocket.OPEN) {
+                upstream.close();
+            }
+        });
+
+        await upstreamReady();
+
+        return response;
+    } else {
+        return c.redirect("/~home");
+    }
 });
 
-app.get("/@module/node%3Autil", (c) => {
-    return c.redirect("/@npm/util/0.12.5");
-});
-
-app.use(async (c, next) => {
+app.use(async (c) => {
     if (c.req.path.startsWith("/~")) {
         let status: StatusCode = 200;
         const html = `<!DOCTYPE html>${
             render(
                 await DevSSR(c.req.path, (error) => {
                     status = error;
-                }, "dplc"),
+                }, "vite"),
             )
         }`;
         return c.html(html, status);
     } else {
-        return next();
+        try {
+            const req = new URL(c.req.url);
+            const res = await fetch(
+                new URL(`http://[::1]:81${req.pathname}${req.search}`),
+                c.req.raw,
+            );
+
+            return res;
+        } catch {
+            return c.text("HTTP 502 Bad Gateway", 502);
+        }
     }
 });
-
-app.get("/", (c) => {
-    return c.redirect("/~dash");
-});
-
-app.route(
-    "/",
-    dev_server({
-        root_module: toFileUrl(join(Deno.cwd(), "frontend/src", "root.ts")),
-        run_graph_server: false,
-        // dev_use_cargo: true,
-        // graph_server_port: 3000,
-        cdn: [
-            "@xterm/xterm",
-            "@xterm/addon-fit",
-            "util",
-        ],
-    }) as unknown as Hono,
-);
 
 function request_handler(req: Request): Promise<Response> | Response {
     return app.fetch(req);
 }
 
 let num_listeners = 0;
-const NUM_LISTENERS = 2;
 function onListen() {
     num_listeners++;
-    assertLessOrEqual(num_listeners, NUM_LISTENERS);
-
-    if (num_listeners === NUM_LISTENERS) {
+    if (num_listeners === 4) {
         console.log("%c[dev server] started", "color: green");
     }
 }

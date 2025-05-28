@@ -21,7 +21,7 @@ import { StatusCode } from "hono/utils/http-status";
 import { SSRContext } from "@deno-plc/router";
 import { importCSS } from "./material-icons.ssr.ts";
 
-export async function DevSSR(path: string, onError: (code: StatusCode) => void) {
+export async function DevSSR(path: string, onError: (code: StatusCode) => void, mode: "dplc" | "vite") {
     const [style, tailwind] = await Promise.all([
         Deno.readTextFile(new URL("./style/style.css", import.meta.url)),
         Deno.readTextFile(new URL("./style/tailwind.css", import.meta.url)),
@@ -41,10 +41,14 @@ export async function DevSSR(path: string, onError: (code: StatusCode) => void) 
                     <style type="text/tailwindcss" dangerouslySetInnerHTML={{ __html: tailwind }} />
                     <script type="module" src="/dev-assets/tailwind-play" async />
 
-                    <script type="module" src="/@vite/client" async />
+                    {mode === "vite" && <script type="module" src="/@vite/client" async />}
                     <script type="module" src="/frontend/src/dev.client.tsx" async />
 
-                    <script type="module" src="/@id/@xterm/xterm/css/xterm.css" async />
+                    {mode === "dplc" && (
+                        <link rel="stylesheet" href="/@npm-data/registry.npmjs.org/@xterm/xterm/5.5.0/css/xterm.css" />
+                    )}
+
+                    {mode === "vite" && <script type="module" src="/@id/@xterm/xterm/css/xterm.css" async />}
                 </head>
                 <body>
                     <span class={`bg-[#111] text-brand flex flex-row items-center justify-center w-full h-full`}>loading...</span>
