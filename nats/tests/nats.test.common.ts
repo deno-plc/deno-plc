@@ -64,7 +64,7 @@ export async function get_test_nats_client(): Promise<{
         }
     });
 
-    const nats = await wsconnect({ servers: ["ws://localhost:1002"] });
+    const nats = await wsconnect({ servers: ["ws://localhost:5223"] });
 
     nats_status.value = NATS_Status.Connected;
     const client = new NatsClient(nats);
