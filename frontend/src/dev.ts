@@ -68,6 +68,7 @@ app.get("/@module/filesink.node.ts", (c) => {
     });
 });
 
+// @cspell:disable-next-line
 app.get("/@module/node%3Autil", (c) => {
     return c.redirect("/@npm/util/0.12.5");
 });

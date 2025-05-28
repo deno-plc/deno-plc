@@ -44,9 +44,7 @@ export async function DevSSR(path: string, onError: (code: StatusCode) => void, 
                     {mode === "vite" && <script type="module" src="/@vite/client" async />}
                     <script type="module" src="/frontend/src/dev.client.tsx" async />
 
-                    {mode === "dplc" && (
-                        <link rel="stylesheet" href="/@npm-data/registry.npmjs.org/@xterm/xterm/5.5.0/css/xterm.css" />
-                    )}
+                    {mode === "dplc" && <link rel="stylesheet" href="/@npm-data/registry.npmjs.org/@xterm/xterm/5.5.0/css/xterm.css" />}
 
                     {mode === "vite" && <script type="module" src="/@id/@xterm/xterm/css/xterm.css" async />}
                 </head>

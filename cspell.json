@@ -26,6 +26,8 @@
         "deno",
         "Deque",
         "djwt",
+        "dplc",
+        "filesink",
         "fullscreen",
         "getnats",
         "gloo",

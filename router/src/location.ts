@@ -23,8 +23,11 @@ import { getLogger } from "@logtape/logtape";
 
 const logger = getLogger(["app", "navigation"]);
 
-const _current_location = signal(location?.pathname);
+const _current_location = signal(self.location ? location?.pathname : "");
 
+/**
+ * A signal that contains the current location path. Does __NOT__ respect SSR.
+ */
 export const current_location: ReadonlySignal<string> = computed(() => _current_location.value);
 
 effect(() => {
@@ -35,6 +38,9 @@ addEventListener("popstate", () => {
     _current_location.value = location.pathname;
 });
 
+/**
+ * Hook to get the current location path. Respects SSR.
+ */
 export function useLocation(): string {
     const ssr_ctx = useSSRContext();
     if (ssr_ctx.ssr) {
@@ -44,12 +50,26 @@ export function useLocation(): string {
     }
 }
 
+/**
+ * Navigates to the given path and creates a new history entry.
+ */
 export function navigate(path: string) {
-    history.pushState({}, "", path);
-    _current_location.value = location.pathname;
+    if (self.history) {
+        history.pushState({}, "", path);
+        _current_location.value = location.pathname;
+    } else {
+        logger.error`Cannot navigate, no history API available. Ignoring`;
+    }
 }
 
+/**
+ * Redirects to the given path __without__ creating a new history entry.
+ */
 export function redirect(path: string) {
-    history.replaceState({}, "", path);
-    _current_location.value = location.pathname;
+    if (self.history) {
+        history.replaceState({}, "", path);
+        _current_location.value = location.pathname;
+    } else {
+        logger.error`Cannot navigate, no history API available. Ignoring`;
+    }
 }

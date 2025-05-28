@@ -21,6 +21,9 @@ import { useEffect } from "preact/hooks";
 import type { JSX as JSXInternal, VNode } from "preact";
 import { navigate, redirect } from "./location.ts";
 
+/**
+ * Wrapper for <a> elements that handles navigation
+ */
 export function Link(p: JSXInternal.HTMLAttributes<HTMLAnchorElement>): VNode {
     return (
         <a
@@ -54,6 +57,9 @@ export function Link(p: JSXInternal.HTMLAttributes<HTMLAnchorElement>): VNode {
     );
 }
 
+/**
+ * Component that redirects to the given URL once it renders.
+ */
 export function Redirect(p: {
     href: string;
 }): null {

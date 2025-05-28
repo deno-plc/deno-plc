@@ -21,6 +21,9 @@ import type { StatusCode } from "hono/utils/http-status";
 import { type ComponentChildren, createContext, type VNode } from "preact";
 import { useContext } from "preact/hooks";
 
+/**
+ * Context for server-side rendering (SSR) information.
+ */
 export interface SSRContext {
     ssr: boolean;
     path: string;
@@ -33,6 +36,10 @@ const ssr_ctx = createContext<SSRContext>({
     error: () => {},
 });
 
+/**
+ * Provider component for SSR context.
+ * This should be used at the root of your application when rendering on the server.
+ */
 export function SSRContext(p: {
     children?: ComponentChildren;
     path: string;
@@ -51,10 +58,16 @@ export function SSRContext(p: {
     );
 }
 
+/**
+ * Hook to access the SSR context.
+ */
 export function useSSRContext(): SSRContext {
     return useContext(ssr_ctx);
 }
 
+/**
+ * Prevent rendering of children when SSR is active.
+ */
 export function SSRBarrier(p: {
     children?: ComponentChildren;
 }): VNode | null {
