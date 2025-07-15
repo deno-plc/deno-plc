@@ -145,6 +145,26 @@ export class MapSource<T extends ValueType = ValueType> {
         }
     }
 
+    public set_many(data: Map<string, T>) {
+        let edits = false;
+        const send_data = new Map<string, T>(data);
+        for (const [key, value] of data) {
+            if (this.#current_value.get(key)?.value !== value) {
+                this.#current_value.set(key, { value, last_update: performance.now() });
+                edits = true;
+                send_data.delete(key);
+            }
+        }
+
+        if (edits) {
+            this.#modified();
+
+            this.#send_partial(Object.fromEntries(send_data.entries()));
+
+            this.#periodic_advertise();
+        }
+    }
+
     public get(key: string): T | undefined {
         return this.#current_value.get(key)?.value;
     }
