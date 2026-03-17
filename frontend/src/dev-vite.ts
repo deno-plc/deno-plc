@@ -20,7 +20,7 @@
 import { createServer } from "vite";
 import { config } from "./vite.ts";
 // import { app } from "../src/server/server.ts";
-import { Lock } from "https://deno.land/x/simple_promise_lock@v2.2.1/deno/lock.ts";
+import { Lock } from "@deno-plc/utils/lock";
 import { render } from "preact-render-to-string";
 import { StatusCode } from "hono/utils/http-status";
 import { DevSSR } from "./dev.ssr.tsx";
@@ -98,11 +98,11 @@ app.all("/", async (c) => {
 
         const upstream = new WebSocket("ws://[::1]:81/", websocketProtocol);
 
-        const upstreamReady = Lock(true);
-        const downstreamReady = Lock(true);
+        const upstreamReady = new Lock(true);
+        const downstreamReady = new Lock(true);
 
         upstream.addEventListener("message", async (ev) => {
-            await downstreamReady();
+            await downstreamReady.wait();
             if (downstream.readyState === WebSocket.OPEN) {
                 downstream.send(ev.data);
             }
@@ -119,7 +119,7 @@ app.all("/", async (c) => {
         });
 
         downstream.addEventListener("message", async (ev) => {
-            await upstreamReady();
+            await upstreamReady.wait();
             if (upstream.readyState === WebSocket.OPEN) {
                 upstream.send(ev.data);
             }
@@ -135,7 +135,7 @@ app.all("/", async (c) => {
             }
         });
 
-        await upstreamReady();
+        await upstreamReady.wait();
 
         return response;
     } else {

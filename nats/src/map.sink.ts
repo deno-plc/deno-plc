@@ -2,7 +2,7 @@
  * @license GPL-3.0-or-later
  * Deno-PLC
  *
- * Copyright (C) 2025 Hans Schallmoser
+ * Copyright (C) 2025 - 2026 Hans Schallmoser
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,13 +29,13 @@ import type { NatsClient } from "./client.ts";
 import { NATS_Status } from "./state_container.ts";
 import { byteEquals } from "@deno-plc/utils/bytes";
 import { wait } from "@deno-plc/utils/wait";
-import type { z } from "zod";
-import { serialize_zod_type, type ZodTypeDefWithKind } from "./zod.eq.ts";
+import { type output, toJSONSchema, type ZodType, type ZodUnknown } from "zod/v4";
+// import { serialize_zod_type, type ZodTypeDefWithKind } from "./zod.eq.ts";
 
 /**
  * Options for subscribing to a map
  */
-export interface MapSinkOptions<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.ZodType<unknown, ZodTypeDefWithKind>> {
+export interface MapSinkOptions<Schema extends ZodType> {
     /**
      * allows MapSinks to fetch the latest value. Recommended for values that do not change on a regular basis.
      * @default true
@@ -62,15 +62,17 @@ export interface MapSinkOptions<Schema extends z.ZodType<unknown, ZodTypeDefWith
 }
 
 interface ValidatedValue<
-    Output = unknown,
-    Def extends ZodTypeDefWithKind = ZodTypeDefWithKind,
-    Schema extends z.ZodType<Output, Def> = z.ZodType<Output, Def>,
+    Schema extends ZodType = ZodUnknown,
 > {
     schema: Schema;
     schema_string: string | null;
-    value: MapSignal<string, Output | null>;
+    value: MapSignal<string, output<Schema> | null>;
     updated: boolean;
     instances: number;
+}
+
+function downcast_value_schema<Schema extends ZodType>(value: ValidatedValue<Schema>): ValidatedValue<ZodUnknown> {
+    return value as unknown as ValidatedValue<ZodUnknown>;
 }
 
 /**
@@ -80,7 +82,7 @@ export class MapSinkInner {
     private constructor(
         readonly client: NatsClient,
         readonly subject: string,
-        readonly opt: Omit<Required<MapSinkOptions<z.ZodType<unknown, ZodTypeDefWithKind>>>, "schema">,
+        readonly opt: Omit<Required<MapSinkOptions<ZodType>>, "schema">,
     ) {
         this.#retry = new RetryManager(this.opt.retry_policy);
         this.#subscription = client.subscribe(`%map_sink_v2%.${subject}`);
@@ -101,7 +103,7 @@ export class MapSinkInner {
     static [$pub_crate$_constructor](
         client: NatsClient,
         subject: string,
-        opt?: MapSinkOptions<z.ZodType<unknown, ZodTypeDefWithKind>>,
+        opt?: MapSinkOptions<ZodType>,
     ): MapSinkInner {
         return new MapSinkInner(client, subject, {
             enable_fetching: true,
@@ -118,10 +120,10 @@ export class MapSinkInner {
     #retry: RetryManager;
 
     readonly raw_value: MapSignal<string, ValueType> = new MapSignal();
-    readonly validated: Map<z.ZodType, ValidatedValue> = new Map();
-    readonly schema_resolved_aliases: WeakMap<z.ZodType, ValidatedValue> = new WeakMap();
+    readonly validated: Map<ZodType, ValidatedValue> = new Map();
+    readonly schema_resolved_aliases: WeakMap<ZodType, ValidatedValue> = new WeakMap();
 
-    static primitive_schemas: Map<string, z.ZodType> = new Map();
+    static primitive_schemas: Map<string, ZodType> = new Map();
 
     readonly valid: Signal<boolean> = signal(false);
 
@@ -242,21 +244,21 @@ export class MapSinkInner {
         });
     }
 
-    #validate<Schema extends z.ZodType>(schema: Schema, value: ValueType): Schema["_output"] | null {
+    #validate<Schema extends ZodType>(schema: Schema, value: ValueType): output<Schema> | null {
         const parsed = schema.safeParse(value);
         if (parsed.success) {
             return parsed.data;
         } else {
-            logger.getChild(this.subject).error`failed to validate value: ${parsed.error.errors}`;
+            logger.getChild(this.subject).error`failed to validate value: ${parsed.error.message}`;
             return null;
         }
     }
 
-    attach<Schema extends z.ZodType<Output, Def>, Output = unknown, Def extends ZodTypeDefWithKind = ZodTypeDefWithKind>(
+    attach<Schema extends ZodType>(
         schema: Schema,
-    ): ValidatedValue<Output, Def, Schema> {
+    ): ValidatedValue<Schema> {
         if (this.schema_resolved_aliases.has(schema)) {
-            const value = this.schema_resolved_aliases.get(schema)! as ValidatedValue<Output, Def, Schema>;
+            const value = this.schema_resolved_aliases.get(schema)! as unknown as ValidatedValue<Schema>;
             value.instances++;
             if (!value.updated) {
                 const map = value.value.unsafe_get_inner_peek();
@@ -273,13 +275,13 @@ export class MapSinkInner {
             return value;
         }
 
-        const schema_string = serialize_zod_type(schema);
+        const schema_string = JSON.stringify(toJSONSchema(schema));
         if (schema_string !== null) {
             if (MapSinkInner.primitive_schemas.has(schema_string)) {
-                const linked_schema = MapSinkInner.primitive_schemas.get(schema_string)! as Schema;
+                const linked_schema: Schema = MapSinkInner.primitive_schemas.get(schema_string)! as Schema;
                 if (linked_schema !== schema) {
-                    const value = this.attach<Schema, Output, Def>(linked_schema);
-                    this.schema_resolved_aliases.set(schema, value);
+                    const value = this.attach(linked_schema);
+                    this.schema_resolved_aliases.set(schema, downcast_value_schema(value));
                     return value;
                 }
             }
@@ -287,7 +289,7 @@ export class MapSinkInner {
             MapSinkInner.primitive_schemas.set(schema_string, schema);
         }
 
-        const value = new MapSignal<string, Output | null>(
+        const value = new MapSignal<string, output<Schema> | null>(
             this.raw_value.unsafe_get_inner_peek().entries().map(([key, raw_value]) => [key, this.#validate(schema, raw_value)]),
         );
 
@@ -297,15 +299,15 @@ export class MapSinkInner {
             value,
             updated: true,
             instances: 1,
-        } satisfies ValidatedValue<Output, Def, Schema>;
+        } satisfies ValidatedValue<Schema>;
 
-        this.validated.set(schema, res);
-        this.schema_resolved_aliases.set(schema, res);
+        this.validated.set(schema, downcast_value_schema(res));
+        this.schema_resolved_aliases.set(schema, downcast_value_schema(res));
 
         return res;
     }
 
-    detach(schema: z.ZodType) {
+    detach(schema: ZodType) {
         const value = this.schema_resolved_aliases.get(schema);
         if (value === undefined) {
             return;
@@ -335,14 +337,14 @@ export interface MapSinkLike<T> extends AsyncDisposable {
     dispose(): Promise<void>;
 }
 
-export class MapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.ZodAny> implements MapSinkLike<Schema["_output"]> {
+export class MapSink<Schema extends ZodType = ZodUnknown> implements MapSinkLike<Schema["_output"]> {
     private constructor(inner: MapSinkInner, readonly schema: Schema) {
         this[$pub_crate$_inner] = inner;
         inner.instances++;
-        this.#validated = inner.attach(schema as unknown as z.ZodType<unknown, ZodTypeDefWithKind>);
+        this.#validated = inner.attach(schema);
         dispose_registry.register(this, `subscription for ${this[$pub_crate$_inner].subject}`, this.#registration_id);
     }
-    static [$pub_crate$_constructor]<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(inner: MapSinkInner, schema: Schema): MapSink<Schema> {
+    static [$pub_crate$_constructor]<Schema extends ZodType>(inner: MapSinkInner, schema: Schema): MapSink<Schema> {
         return new MapSink(inner, schema);
     }
     // for some reason Firefox does not like symbols as unregister tokens
@@ -350,7 +352,7 @@ export class MapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.Z
     readonly #registration_id = {};
     #destroyed = false;
     readonly [$pub_crate$_inner]: MapSinkInner;
-    readonly #validated: ValidatedValue;
+    readonly #validated: ValidatedValue<Schema>;
 
     /**
      * Access the {@link MapSignal} that contains the current values of the map.

@@ -36,8 +36,7 @@ import { MapSink, MapSinkInner, type MapSinkOptions } from "./map.sink.ts";
 import { MapSource, type MapSourceOptions } from "./map.source.ts";
 import { $pub_crate$_blob_subscriptions, $pub_crate$_constructor, $pub_crate$_inner, $pub_crate$_map_subscriptions } from "./pub_crate.ts";
 import { RetryManager, type RetryPolicy } from "./shared.ts";
-import type { z } from "zod";
-import type { ZodTypeDefWithKind } from "./zod.eq.ts";
+import type * as z from "zod/v4";
 import type { ValueType } from "@std/msgpack/encode";
 
 /**
@@ -104,7 +103,7 @@ export class NatsClient {
     /**
      * Transmits the specified byte array to the specified subject.
      */
-    blob_source(subject: string, initial: Uint8Array, opt?: BlobSourceOptions): BlobSource {
+    blob_source(subject: string, initial: Uint8Array<ArrayBuffer>, opt?: BlobSourceOptions): BlobSource {
         return BlobSource[$pub_crate$_constructor](this, subject, initial, opt);
     }
 
@@ -155,12 +154,12 @@ export class NatsClient {
     /**
      * Transmits the shared map to the specified subject.
      */
-    map_source<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(
+    map_source<Schema extends z.ZodType>(
         subject: string,
         opt: MapSourceOptions & {
             schema: Schema;
         },
-    ): MapSource<z.infer<Schema> & ValueType> {
+    ): MapSource<z.output<Schema> & ValueType> {
         return MapSource[$pub_crate$_constructor](this, subject, opt);
     }
 
@@ -174,7 +173,7 @@ export class NatsClient {
     /**
      * Sinks (receives) a shared map from the specified subject.
      */
-    map_sink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(subject: string, opt: MapSinkOptions<Schema>): MapSink<Schema> {
+    map_sink<Schema extends z.ZodType>(subject: string, opt: MapSinkOptions<Schema>): MapSink<Schema> {
         let inner: MapSinkInner;
         if (this[$pub_crate$_map_subscriptions].has(subject)) {
             inner = this[$pub_crate$_map_subscriptions].get(subject)!;
@@ -190,7 +189,7 @@ export class NatsClient {
      * Compatible with preact/hooks
      * Important: The schema should be memoized.
      */
-    useMapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(subject: string, opt: MapSinkOptions<Schema>): MapSink<Schema> {
+    useMapSink<Schema extends z.ZodType>(subject: string, opt: MapSinkOptions<Schema>): MapSink<Schema> {
         // always sync hooks with placeholders in hooks.ts !!
         const sink = useRef<MapSink<Schema> | null>(null);
         useEffect(() => () => {

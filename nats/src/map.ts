@@ -17,13 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type z from "zod";
+import type { ZodType } from "zod/v4";
 import type { MapSinkOptions } from "./map.sink.ts";
 import type { MapSourceOptions } from "./map.source.ts";
-import type { ZodTypeDefWithKind } from "./zod.eq.ts";
 
 /**
  * Options for MapSinks and MapSources
  */
-export interface MapOptions<Schema extends z.ZodType<unknown, ZodTypeDefWithKind> = z.ZodType<unknown, ZodTypeDefWithKind>>
-    extends MapSinkOptions<Schema>, MapSourceOptions {}
+export interface MapOptions<Schema extends ZodType = ZodType> extends MapSinkOptions<Schema>, MapSourceOptions {}

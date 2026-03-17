@@ -100,7 +100,7 @@ export function init_nightly(provider: Nightly) {
     self[NIGHTLY_INITIALIZED_SYMBOL]();
 }
 
-const Storage = z.record(z.union([z.string(), z.boolean(), z.number(), z.null()]));
+const Storage = z.record(z.string(), z.union([z.string(), z.boolean(), z.number(), z.null()]));
 type Storage = z.infer<typeof Storage>;
 
 /**

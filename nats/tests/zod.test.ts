@@ -17,10 +17,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { z } from "zod";
-import { serialize_zod_type } from "../src/zod.eq.ts";
+import { toJSONSchema, z } from "zod/v4";
 import { assertEquals, assertNotEquals } from "@std/assert";
 import { assert } from "@std/assert/assert";
+
+function serialize_zod_type<S extends z.ZodType>(schema: S): string | null {
+    return JSON.stringify(toJSONSchema(schema));
+}
 
 Deno.test("zodSerialize primitive", () => {
     const types = [
@@ -43,20 +46,5 @@ Deno.test("zodSerialize primitive", () => {
                 assertNotEquals(a_serialized, b_serialized);
             }
         }
-    }
-});
-
-Deno.test("zodSerialize complex", () => {
-    const types = [
-        z.array(z.string()),
-        z.object({
-            a: z.string(),
-            b: z.number(),
-        }),
-        z.union([z.string(), z.number()]),
-    ];
-    for (const t of types) {
-        const serialized = serialize_zod_type(t);
-        assert(serialized === null);
     }
 });

@@ -18,7 +18,7 @@
  */
 
 import { kebabCase, titleCase } from "@luca/cases";
-import { join } from "jsr:@std/path@^1.0.4/join";
+import { join } from "@std/path/join";
 import { z } from "zod";
 
 function css_for_family(fam: string, mode: "dev" | "build") {

@@ -23,8 +23,7 @@ import { get_nats, type NatsClient } from "../mod.ts";
 import { useEffect, useRef } from "preact/hooks";
 import type { MapSinkLike, MapSinkOptions } from "./map.sink.ts";
 import { MapSignal } from "@deno-plc/signal-utils/map";
-import type { ZodTypeDefWithKind } from "./zod.eq.ts";
-import type z from "zod";
+import type z from "zod/v4";
 import type { ValueType } from "@std/msgpack/encode";
 
 const nats = signal<NatsClient | null>(null);
@@ -89,7 +88,7 @@ export class FakeMapSink<T> implements MapSinkLike<T> {
  * Compatible with preact/hooks
  * Important: The schema should be memoized.
  */
-export function useMapSink<Schema extends z.ZodType<unknown, ZodTypeDefWithKind>>(
+export function useMapSink<Schema extends z.ZodType>(
     subject: string,
     opt: MapSinkOptions<Schema>,
 ): MapSinkLike<Schema["_output"]> {

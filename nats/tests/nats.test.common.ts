@@ -19,7 +19,7 @@
 
 import { wsconnect } from "@nats-io/nats-core";
 import { NatsClient } from "../mod.ts";
-import { fromFileUrl } from "jsr:@std/path";
+import { fromFileUrl } from "@std/path";
 import { configure, getConsoleSink, getLogger, type Logger } from "@logtape/logtape";
 import { NATS_Status, nats_status } from "../src/state_container.ts";
 

@@ -65,7 +65,7 @@ export class BlobSource {
         });
     }
 
-    static [$pub_crate$_constructor](client: NatsClient, subject: string, initial: Uint8Array, options?: BlobSourceOptions): BlobSource {
+    static [$pub_crate$_constructor](client: NatsClient, subject: string, initial: Uint8Array<ArrayBuffer>, options?: BlobSourceOptions): BlobSource {
         const full_options = {
             periodic_update: 0,
             periodic_advertise: 0,
@@ -99,7 +99,7 @@ export class BlobSource {
         }
     }
 
-    public async update(data: Uint8Array): Promise<void> {
+    public async update(data: Uint8Array<ArrayBuffer>): Promise<void> {
         await this.#update_lock.wait();
         this.#update_lock.lock();
 

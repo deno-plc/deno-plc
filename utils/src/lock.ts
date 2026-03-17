@@ -76,6 +76,15 @@ export class Lock {
         });
     }
 
+    public async acquire(): Promise<void> {
+        await this.wait();
+        if (this.#locked) {
+            await this.acquire();
+        } else {
+            this.#locked = true;
+        }
+    }
+
     /**
      * @returns true if the lock is locked
      */
