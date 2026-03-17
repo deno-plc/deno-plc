@@ -1,7 +1,7 @@
 {
     "name": "@deno-plc/signal-utils",
     "version": "0.0.5",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "exports": {
         "./async": "./src/async.ts",
         "./map": "./src/map.ts",

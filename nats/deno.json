@@ -1,7 +1,7 @@
 {
     "name": "@deno-plc/nats",
     "version": "0.3.5",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "exports": "./mod.ts",
     "imports": {
         "@std/msgpack": "jsr:@std/msgpack@^1.0.3"

@@ -1,7 +1,7 @@
 {
     "name": "@deno-plc/utils",
     "version": "0.2.1",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "exports": {
         "./ascii": "./src/ascii.ts",
         "./geometry": "./src/geo.ts",

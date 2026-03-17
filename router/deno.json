@@ -1,6 +1,6 @@
 {
     "name": "@deno-plc/router",
     "version": "0.0.3",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "exports": "./mod.ts"
 }
